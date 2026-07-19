@@ -2,6 +2,7 @@
 
 require_once "database/db.php";
 
+// Create sql query to get all active products from the database
 $sql = "
     SELECT
         products.product_id,
@@ -16,7 +17,6 @@ $sql = "
     WHERE products.is_active = 1
     ORDER BY categories.category_name, products.product_name
 ";
-
 $stmt = $connection->query($sql);
 $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
