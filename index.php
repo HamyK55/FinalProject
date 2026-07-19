@@ -70,6 +70,20 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
         .out-of-stock {
             color: #a00000;
         }
+
+        .view-product {
+            display: inline-block;
+            padding: 10px 16px;
+            margin-top: 10px;
+            border-radius: 6px;
+            color: white;
+            background-color: #68794c;
+            text-decoration: none;
+        }
+
+        .view-product:hover {
+            background-color: #53613d;
+        }
     </style>
 </head>
 
@@ -111,6 +125,11 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <?php else: ?>
                         <p class="out-of-stock">Out of stock</p>
                     <?php endif; ?>
+
+                    <!-- Link to specific product description --> 
+                    <a class="view-product" href="product.php?id=<?= (int) $product["product_id"] ?>">
+                        View Product
+                    </a>
                 </article>
 
             <?php endforeach; ?>
