@@ -28,63 +28,7 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Our Products</title>
-
-    <style>
-        body {
-            margin: 0;
-            padding: 30px;
-            font-family: Arial, sans-serif;
-            background-color: #f5f2ea;
-            color: #333;
-        }
-
-        h1 {
-            text-align: center;
-        }
-
-        .product-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 20px;
-            max-width: 1100px;
-            margin: 30px auto;
-        }
-
-        .product-card {
-            padding: 20px;
-            border: 1px solid #ddd;
-            border-radius: 10px;
-            background-color: white;
-        }
-
-        .category {
-            color: #68794c;
-            font-weight: bold;
-        }
-
-        .price {
-            font-size: 1.2rem;
-            font-weight: bold;
-        }
-
-        .out-of-stock {
-            color: #a00000;
-        }
-
-        .view-product {
-            display: inline-block;
-            padding: 10px 16px;
-            margin-top: 10px;
-            border-radius: 6px;
-            color: white;
-            background-color: #68794c;
-            text-decoration: none;
-        }
-
-        .view-product:hover {
-            background-color: #53613d;
-        }
-    </style>
+    <link rel="stylesheet" href="css/default_style.css">
 </head>
 
 <body>

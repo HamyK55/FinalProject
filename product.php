@@ -33,14 +33,15 @@ $sql = "
     WHERE products.product_id = :product_id
       AND products.is_active = 1
 ";
-
+//turns sql into prepared statement
 $stmt = $connection->prepare($sql);
 
+//adds in live product id 
 $stmt->execute([
     "product_id" => $productId
 ]);
 
-// Get Product Details
+// Get Product Details into an array that we can use later
 $product = $stmt->fetch(PDO::FETCH_ASSOC);
 
 if (!$product) {
@@ -93,58 +94,11 @@ foreach ($options as $option) {
     <title>
         <?= htmlspecialchars($product["product_name"]) ?>
     </title>
-
-    <style>
-        body {
-            margin: 0;
-            padding: 30px;
-            font-family: Arial, sans-serif;
-            color: #333;
-            background-color: #f5f2ea;
-        }
-
-        .product-details {
-            max-width: 650px;
-            margin: 30px auto;
-            padding: 30px;
-            border-radius: 12px;
-            background-color: white;
-            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.1);
-        }
-
-        .category {
-            color: #68794c;
-            font-weight: bold;
-        }
-
-        .price {
-            font-size: 1.5rem;
-            font-weight: bold;
-        }
-
-        .option-group {
-            margin: 20px 0;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 6px;
-            font-weight: bold;
-        }
-
-        select {
-            width: 100%;
-            padding: 10px;
-        }
-
-        .back-link {
-            color: #53613d;
-        }
-    </style>
+    <link rel="stylesheet" href="css/default_style.css">
 </head>
 
 <body>
-    <!-- Main product Detail card -->
+    <!-- Main product Detail card, populate page with uptodate info directly from database $product [field name]-->
     <main class="product-details">
 
         <a class="back-link" href="index.php">
@@ -174,10 +128,11 @@ foreach ($options as $option) {
             In stock: <?= (int) $product["stock"] ?>
         </p>
 
+        <!-- Create option groups based on number of options in database, will make more if new options are added -->
+
         <?php foreach ($optionGroups as $optionName => $values): ?>
 
-        <!-- Create option groups, and script will dynamically change price based on options chosen -->
-
+            <!-- Render one dropdown for each option group from the database. -->
             <div class="option-group">
 
                 <label>
@@ -188,6 +143,7 @@ foreach ($options as $option) {
 
                     <?php foreach ($values as $option): ?>
 
+                        <!-- Store the option ID for form use and the price change for JavaScript. -->
                         <option
                             value="<?= (int) $option["option_id"] ?>"
                             data-adjustment="<?=
@@ -198,6 +154,7 @@ foreach ($options as $option) {
                         >
                             <?= htmlspecialchars($option["option_value"]) ?>
 
+                            <!-- Show the extra cost only when this choice adds to the base price. -->
                             <?php if ($option["price_adjustment"] > 0): ?>
                                 (+$<?= number_format(
                                     $option["price_adjustment"],
@@ -217,15 +174,19 @@ foreach ($options as $option) {
     </main>
 
     <script>
+        // Start with the product's base price from PHP.
         const basePrice =
             <?= json_encode((float) $product["base_price"]) ?>;
 
+        // Collect every option dropdown on the page.
         const optionMenus =
             document.querySelectorAll(".product-option");
 
+        // This is the element that shows the live calculated price.
         const displayPrice =
             document.getElementById("display-price");
 
+        // Recalculate the total by adding each selected option's price adjustment.
         function updatePrice() {
             let updatedPrice = basePrice;
 
@@ -242,10 +203,12 @@ foreach ($options as $option) {
                 "$" + updatedPrice.toFixed(2);
         }
 
+        // listen for an update in the options and then Update the price 
         optionMenus.forEach(function (menu) {
             menu.addEventListener("change", updatePrice);
         });
 
+        // Run once on page load so the displayed price starts in sync.
         updatePrice();
     </script>
 
