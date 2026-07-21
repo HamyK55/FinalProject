@@ -98,6 +98,17 @@ foreach ($options as $option) {
 </head>
 
 <body>
+
+    <header class="site-header">
+        <a class="site-brand" href="index.php">
+            Olive Tree Soap Co.
+        </a>
+
+        <a class="site-cart-link" href="cart.php">
+            View Cart
+        </a>
+    </header>
+
     <!-- Main product Detail card, populate page with uptodate info directly from database $product [field name]-->
     <main class="product-details">
 
@@ -128,48 +139,64 @@ foreach ($options as $option) {
             In stock: <?= (int) $product["stock"] ?>
         </p>
 
-        <!-- Create option groups based on number of options in database, will make more if new options are added -->
+        <form class="product-form" action="cart.php" method="post">
 
-        <?php foreach ($optionGroups as $optionName => $values): ?>
+            <input type="hidden" name="action" value="add">
+            <input type="hidden" name="product_id" value="<?= (int) $productId ?>">
 
-            <!-- Render one dropdown for each option group from the database. -->
-            <div class="option-group">
+            <!-- Create option groups based on number of options in database, will make more if new options are added -->
+            <?php foreach ($optionGroups as $optionName => $values): ?>
 
-                <label>
-                    <?= htmlspecialchars($optionName) ?>
+                <!-- Render one dropdown for each option group from the database. -->
+                <div class="option-group">
+
+                    <label>
+                        <?= htmlspecialchars($optionName) ?>
+                    </label>
+
+                    <select class="product-option" name="option_ids[]" required>
+
+                        <?php foreach ($values as $option): ?>
+
+                            <!-- Store the option ID for form use and the price change for JavaScript. -->
+                            <option
+                                value="<?= (int) $option["option_id"] ?>"
+                                data-adjustment="<?=
+                                    htmlspecialchars(
+                                        $option["price_adjustment"]
+                                    )
+                                ?>"
+                            >
+                                <?= htmlspecialchars($option["option_value"]) ?>
+
+                                <!-- Show the extra cost only when this choice adds to the base price. -->
+                                <?php if ($option["price_adjustment"] > 0): ?>
+                                    (+$<?= number_format(
+                                        $option["price_adjustment"],
+                                        2
+                                    ) ?>)
+                                <?php endif; ?>
+                            </option>
+
+                        <?php endforeach; ?>
+
+                    </select>
+
+                </div>
+
+            <?php endforeach; ?>
+
+            <div class="product-actions">
+                <label class="quantity-field">
+                    Quantity
+                    <input type="number" name="quantity" min="1" value="1" required>
                 </label>
 
-                <select class="product-option">
-
-                    <?php foreach ($values as $option): ?>
-
-                        <!-- Store the option ID for form use and the price change for JavaScript. -->
-                        <option
-                            value="<?= (int) $option["option_id"] ?>"
-                            data-adjustment="<?=
-                                htmlspecialchars(
-                                    $option["price_adjustment"]
-                                )
-                            ?>"
-                        >
-                            <?= htmlspecialchars($option["option_value"]) ?>
-
-                            <!-- Show the extra cost only when this choice adds to the base price. -->
-                            <?php if ($option["price_adjustment"] > 0): ?>
-                                (+$<?= number_format(
-                                    $option["price_adjustment"],
-                                    2
-                                ) ?>)
-                            <?php endif; ?>
-                        </option>
-
-                    <?php endforeach; ?>
-
-                </select>
-
+                <button class="add-to-cart" type="submit">
+                    Add to Cart
+                </button>
             </div>
-
-        <?php endforeach; ?>
+        </form>
 
     </main>
 
