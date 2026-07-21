@@ -22,9 +22,10 @@ foreach ($_SESSION["cart"] as $item) {
 }
 
 
-// Get info from server related to orders
+// Get info from the checkout form submission
 $orderPlaced = false;
 $orderNumber = null;
+$orderError = null;
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $name = trim($_POST["full_name"] ?? "");
@@ -39,10 +40,62 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         exit;
     }
 
-    
-    $_SESSION["cart"] = [];
-    $orderPlaced = true;
-    $orderNumber = random_int(100000, 999999);
+
+    $orderNumber = sprintf(
+        "ORD-%s-%04d",
+        date("YmdHis"),
+        random_int(0, 9999)
+    );
+
+    // Insert order into the database
+    try {
+        $connection->beginTransaction();
+
+        $orderSql = "
+            INSERT INTO orders (
+                user_id,
+                order_number,
+                full_name,
+                email,
+                shipping_address,
+                subtotal_cents,
+                total_cents
+            ) VALUES (
+                1,
+                :order_number,
+                :full_name,
+                :email,
+                :shipping_address,
+                :subtotal_cents,
+                :total_cents
+            )
+        ";
+
+        // Prepare and execute the order insertion
+        $orderStatement = $connection->prepare($orderSql);
+        $orderStatement->execute([
+            "order_number" => $orderNumber,
+            "full_name" => $name,
+            "email" => $email,
+            "shipping_address" => $address,
+            "subtotal_cents" => $cartSubtotalCents,
+            "total_cents" => $cartSubtotalCents
+        ]);
+
+        $connection->commit();
+
+        $_SESSION["cart"] = [];
+        $orderPlaced = true;
+    } catch (PDOException $error) {
+        if ($connection->inTransaction()) {
+            $connection->rollBack();
+        }
+
+        $orderError =
+            "We could not save your order right now. Please try again.";
+
+        $_SESSION["checkout_message"] = $orderError;
+    }
 }
 
 $checkoutMessage = $_SESSION["checkout_message"] ?? null;
@@ -77,7 +130,7 @@ unset($_SESSION["checkout_message"]);
 
             <p>
                 Thank you for your order. Your order number is
-                <strong>#<?= (int) $orderNumber ?></strong>.
+                <strong>#<?= htmlspecialchars($orderNumber) ?></strong>.
             </p>
 
             <p>
