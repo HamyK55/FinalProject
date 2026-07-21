@@ -1,6 +1,10 @@
 <?php
 
+session_start();
+
 require_once "database/db.php";
+
+$loggedInUserName = $_SESSION["user_name"] ?? null;
 
 $sql = "
     SELECT
@@ -38,9 +42,37 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
             Olive Tree Soap Co.
         </a>
 
-        <a class="site-cart-link" href="cart.php">
-            View Cart
-        </a>
+        <div class="site-links">
+            <a class="site-cart-link" href="cart.php">
+                View Cart
+            </a>
+            <!-- shows the order history button if user is logged in, but if not, it shows the register and login button -->
+            <?php if ($loggedInUserName): ?>
+
+                <a class="site-link" href="order_history.php">
+                    Order History
+                </a>
+
+                <a class="site-link" href="logout.php">
+                    Logout
+                </a>
+
+                <span class="site-user-note">
+                    Hi, <?= htmlspecialchars($loggedInUserName) ?>
+                </span>
+
+            <?php else: ?>
+
+                <a class="site-link" href="login.php">
+                    Login
+                </a>
+
+                <a class="site-link" href="register.php">
+                    Register
+                </a>
+
+            <?php endif; ?>
+        </div>
     </header>
 
     <h1>Our Products</h1>

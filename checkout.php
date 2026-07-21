@@ -21,6 +21,7 @@ if (count($_SESSION["cart"]) === 0) {
 $cartSubtotalCents = 0;
 $totalItemQuantity = 0;
 $cartQuantitiesByProduct = [];
+$userId = (int) ($_SESSION["user_id"] ?? 1);
 
 foreach ($_SESSION["cart"] as $item) {
     $cartSubtotalCents += $item["unit_price_cents"] * $item["quantity"];
@@ -65,7 +66,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     );
 
     /*
-     * Give the order its own number so it can be found later.
+     * Craft sql command to insert the order into the database.
      */
     try {
         $connection->beginTransaction();
@@ -80,7 +81,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 subtotal_cents,
                 total_cents
             ) VALUES (
-                1,
+                :user_id,
                 :order_number,
                 :full_name,
                 :email,
@@ -91,10 +92,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         ";
 
         /*
-         * Save the order details into the database.
+         * Save the order details into the database. Associate the order with the signed in shopper.
          */
         $orderStatement = $connection->prepare($orderSql);
         $orderStatement->execute([
+            "user_id" => $userId,
             "order_number" => $orderNumber,
             "full_name" => $name,
             "email" => $email,
@@ -166,7 +168,35 @@ unset($_SESSION["checkout_message"]);
 
     <header class="site-header">
         <a class="site-brand" href="index.php">Olive Tree Soap Co.</a>
-        <a class="site-cart-link" href="cart.php">View Cart</a>
+        <!-- shows the order history button if user is logged in, but if not, it shows the register and login button -->
+            <a class="site-cart-link" href="cart.php">View Cart</a>
+
+            <?php if (!empty($_SESSION["user_name"])): ?>
+
+                <a class="site-link" href="order_history.php">
+                    Order History
+                </a>
+
+                <a class="site-link" href="logout.php">
+                    Logout
+                </a>
+
+                <span class="site-user-note">
+                    Hi, <?= htmlspecialchars($_SESSION["user_name"]) ?>
+                </span>
+
+            <?php else: ?>
+
+                <a class="site-link" href="login.php">
+                    Login
+                </a>
+
+                <a class="site-link" href="register.php">
+                    Register
+                </a>
+
+            <?php endif; ?>
+        </div>
     </header>
 
     <main class="product-details">

@@ -1,3 +1,4 @@
+/* Basic page setup for all pages. */
 body {
     margin: 0;
     padding: 30px;
@@ -6,6 +7,7 @@ body {
     color: #333;
 }
 
+/* Top bar that holds the site name and cart link. */
 .site-header {
     max-width: 1100px;
     margin: 0 auto 30px;
@@ -31,6 +33,16 @@ body {
 }
 
 .site-cart-link {
+    display: inline-block;
+    padding: 10px 14px;
+    border-radius: 6px;
+    color: white;
+    background-color: #68794c;
+    text-decoration: none;
+}
+
+.site-link {
+    display: inline-block;
     padding: 10px 14px;
     border-radius: 6px;
     color: white;
@@ -42,10 +54,28 @@ body {
     background-color: #53613d;
 }
 
+.site-link:hover {
+    background-color: #53613d;
+}
+
+.site-links {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.site-user-note {
+    color: #555;
+    font-weight: bold;
+}
+
+/* Main page titles. */
 h1 {
     text-align: center;
 }
 
+/* Grid layout for the product list on the home page. */
 .product-container {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -54,6 +84,7 @@ h1 {
     margin: 30px auto;
 }
 
+/* Box around each product on the home page. */
 .product-card {
     padding: 20px;
     border: 1px solid #ddd;
@@ -89,6 +120,7 @@ h1 {
     background-color: #53613d;
 }
 
+/* Box around the single product page and checkout page. */
 .product-details {
     max-width: 650px;
     margin: 30px auto;
@@ -121,6 +153,7 @@ select {
     color: #53613d;
 }
 
+/* Space and layout for the checkout form. */
 .product-form {
     margin-top: 24px;
     padding-top: 20px;
@@ -136,6 +169,7 @@ select {
 
 .product-form input[type="text"],
 .product-form input[type="email"],
+.product-form input[type="password"],
 .product-form textarea {
     width: 100%;
     padding: 10px;
@@ -165,6 +199,7 @@ select {
     background-color: #53613d;
 }
 
+/* Small summary box showing what is in the order. */
 .checkout-items {
     margin: 20px 0;
     padding: 20px;
@@ -189,10 +224,25 @@ select {
     color: #555;
 }
 
-/* ========================================
-   Shopping Cart
-   ======================================== */
+.order-list {
+    display: grid;
+    gap: 14px;
+    margin-top: 20px;
+}
 
+.order-card {
+    padding: 18px;
+    border-radius: 10px;
+    background-color: #f7f4ec;
+}
+
+.order-card h2 {
+    margin-top: 0;
+}
+
+/* Shopping cart page styles. */
+
+/* Main cart page wrapper. */
 .cart-container {
     max-width: 1000px;
     margin: 30px auto;
@@ -209,6 +259,7 @@ select {
     text-align: left;
 }
 
+/* One item inside the cart. */
 .cart-item {
     display: grid;
     grid-template-columns: 2fr 1fr 1fr;
@@ -243,6 +294,7 @@ select {
     font-weight: bold;
 }
 
+/* Message shown after cart actions like add, update, or remove. */
 .cart-message {
     padding: 14px;
     margin-bottom: 20px;
@@ -294,6 +346,7 @@ select {
     background-color: #762727;
 }
 
+/* Final totals and checkout buttons. */
 .cart-summary {
     margin-top: 25px;
     padding: 25px;
@@ -321,7 +374,7 @@ select {
     margin-top: 20px;
 }
 
-/* Cart layout for mobile devices */
+/* Make the cart easier to use on small screens. */
 @media (max-width: 700px) {
     body {
         padding: 15px;

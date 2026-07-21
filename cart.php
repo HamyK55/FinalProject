@@ -6,6 +6,7 @@
 session_start();
 
 require_once "database/db.php";
+$loggedInUserName = $_SESSION["user_name"] ?? null;
 
 /*
  * Create the cart if it does not exist yet.
@@ -76,6 +77,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 "This product is no longer available.";
 
             header("Location: cart.php");
+            exit;
             exit;
         }
 

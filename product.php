@@ -1,6 +1,10 @@
 <?php
 
+session_start();
+
 require_once "database/db.php";
+
+$loggedInUserName = $_SESSION["user_name"] ?? null;
 
 /*
  * Get the product ID from the URL.
@@ -104,9 +108,37 @@ foreach ($options as $option) {
             Olive Tree Soap Co.
         </a>
 
-        <a class="site-cart-link" href="cart.php">
-            View Cart
-        </a>
+        <div class="site-links">
+            <a class="site-cart-link" href="cart.php">
+                View Cart
+            </a>
+
+            <?php if ($loggedInUserName): ?>
+
+                <a class="site-link" href="order_history.php">
+                    Order History
+                </a>
+
+                <a class="site-link" href="logout.php">
+                    Logout
+                </a>
+
+                <span class="site-user-note">
+                    Hi, <?= htmlspecialchars($loggedInUserName) ?>
+                </span>
+
+            <?php else: ?>
+
+                <a class="site-link" href="login.php">
+                    Login
+                </a>
+
+                <a class="site-link" href="register.php">
+                    Register
+                </a>
+
+            <?php endif; ?>
+        </div>
     </header>
 
     <!-- Main product Detail card, populate page with uptodate info directly from database $product [field name]-->
