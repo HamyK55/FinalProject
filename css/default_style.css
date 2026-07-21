@@ -134,6 +134,14 @@ select {
     margin-top: 20px;
 }
 
+.product-form input[type="text"],
+.product-form input[type="email"],
+.product-form textarea {
+    width: 100%;
+    padding: 10px;
+    box-sizing: border-box;
+}
+
 .quantity-field {
     width: 110px;
 }
@@ -155,6 +163,30 @@ select {
 
 .add-to-cart:hover {
     background-color: #53613d;
+}
+
+.checkout-items {
+    margin: 20px 0;
+    padding: 20px;
+    border-radius: 10px;
+    background-color: #f7f4ec;
+}
+
+.checkout-items ul {
+    margin: 0;
+    padding-left: 20px;
+}
+
+.checkout-summary {
+    margin-top: 20px;
+    padding: 20px;
+    border-radius: 10px;
+    background-color: #f7f4ec;
+}
+
+.checkout-note {
+    margin-top: 10px;
+    color: #555;
 }
 
 /* ========================================
