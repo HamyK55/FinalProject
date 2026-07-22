@@ -17,6 +17,7 @@ $orders = [];
 if ($loggedInUserId > 0) {
     $ordersSql = "
         SELECT
+                order_id,
             order_number,
             full_name,
             email,
@@ -35,6 +36,45 @@ if ($loggedInUserId > 0) {
     ]);
 
     $orders = $ordersStatement->fetchAll(PDO::FETCH_ASSOC);
+}
+
+/*
+ * Get line item details for each order
+ */
+$orderItemsByOrderId = [];
+
+if ($loggedInUserId > 0 && count($orders) > 0) {
+    $orderIds = array_map(
+        static fn(array $order): int => (int) $order["order_id"],
+        $orders
+    );
+
+    $placeholders = implode(
+        ", ",
+        array_fill(0, count($orderIds), "?")
+    );
+
+    $orderItemsSql = "
+        SELECT
+            order_id,
+            product_name,
+            category_name,
+            unit_price_cents,
+            quantity,
+            line_total_cents,
+            options_json
+        FROM order_items
+        WHERE user_id = ?
+          AND order_id IN ($placeholders)
+        ORDER BY order_id DESC, order_item_id ASC
+    ";
+
+    $orderItemsStatement = $connection->prepare($orderItemsSql);
+    $orderItemsStatement->execute(array_merge([$loggedInUserId], $orderIds));
+
+    foreach ($orderItemsStatement->fetchAll(PDO::FETCH_ASSOC) as $item) {
+        $orderItemsByOrderId[(int) $item["order_id"]][] = $item;
+    }
 }
 
 ?>
@@ -94,6 +134,7 @@ if ($loggedInUserId > 0) {
 
         <?php else: ?>
 
+            <!-- Show the list of orders for the logged in user -->
             <div class="order-list">
 
                 <?php foreach ($orders as $order): ?>
@@ -120,6 +161,39 @@ if ($loggedInUserId > 0) {
                             Total:
                             $<?= number_format($order["total_cents"] / 100, 2) ?>
                         </p>
+
+                        <!-- Show line items for the current order -->
+                        <?php if (!empty($orderItemsByOrderId[(int) $order["order_id"]])): ?>
+
+                            <ul>
+                                <?php foreach ($orderItemsByOrderId[(int) $order["order_id"]] as $item): ?>
+                                    <li>
+                                        <?= htmlspecialchars($item["product_name"]) ?>
+                                        x <?= (int) $item["quantity"] ?>
+                                        - $<?= number_format($item["line_total_cents"] / 100, 2) ?>
+
+                                        <?php
+                                        $itemOptions = json_decode(
+                                            $item["options_json"],
+                                            true
+                                        );
+                                        ?>
+
+                                        <?php if (is_array($itemOptions) && count($itemOptions) > 0): ?>
+                                            <ul>
+                                                <?php foreach ($itemOptions as $option): ?>
+                                                    <li>
+                                                        <?= htmlspecialchars($option["option_name"] ?? "Option") ?>:
+                                                        <?= htmlspecialchars($option["option_value"] ?? "") ?>
+                                                    </li>
+                                                <?php endforeach; ?>
+                                            </ul>
+                                        <?php endif; ?>
+                                    </li>
+                                <?php endforeach; ?>
+                            </ul>
+
+                        <?php endif; ?>
 
                     </article>
 

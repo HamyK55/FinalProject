@@ -15,13 +15,15 @@ if (count($_SESSION["cart"]) === 0) {
     exit;
 }
 
+$userId = (int) ($_SESSION["user_id"] ?? 0);
+$loggedInUserName = $_SESSION["user_name"] ?? null;
+
 /*
  * Work out the cart total and count how many items are inside it.
  */
 $cartSubtotalCents = 0;
 $totalItemQuantity = 0;
 $cartQuantitiesByProduct = [];
-$userId = (int) ($_SESSION["user_id"] ?? 1);
 
 foreach ($_SESSION["cart"] as $item) {
     $cartSubtotalCents += $item["unit_price_cents"] * $item["quantity"];
@@ -43,6 +45,14 @@ $orderNumber = null;
 $orderError = null;
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    if ($userId <= 0) {
+        $_SESSION["checkout_message"] =
+            "Please log in before placing your order.";
+
+        header("Location: checkout.php");
+        exit;
+    }
+
     $name = trim($_POST["full_name"] ?? "");
     $email = trim($_POST["email"] ?? "");
     $address = trim($_POST["address"] ?? "");
@@ -104,6 +114,55 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             "subtotal_cents" => $cartSubtotalCents,
             "total_cents" => $cartSubtotalCents
         ]);
+
+        $orderId = (int) $connection->lastInsertId();
+
+        $orderItemSql = "
+            INSERT INTO order_items (
+                order_id,
+                user_id,
+                order_number,
+                product_id,
+                product_name,
+                category_name,
+                unit_price_cents,
+                quantity,
+                line_total_cents,
+                options_json
+            ) VALUES (
+                :order_id,
+                :user_id,
+                :order_number,
+                :product_id,
+                :product_name,
+                :category_name,
+                :unit_price_cents,
+                :quantity,
+                :line_total_cents,
+                :options_json
+            )
+        ";
+
+        $orderItemStatement = $connection->prepare($orderItemSql);
+
+        foreach ($_SESSION["cart"] as $item) {
+            $orderItemStatement->execute([
+                "order_id" => $orderId,
+                "user_id" => $userId,
+                "order_number" => $orderNumber,
+                "product_id" => (int) $item["product_id"],
+                "product_name" => $item["product_name"],
+                "category_name" => $item["category_name"],
+                "unit_price_cents" => (int) $item["unit_price_cents"],
+                "quantity" => (int) $item["quantity"],
+                "line_total_cents" =>
+                    (int) $item["unit_price_cents"] * (int) $item["quantity"],
+                "options_json" => json_encode(
+                    $item["options"],
+                    JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES
+                )
+            ]);
+        }
 
         $stockStatement = $connection->prepare(
             "
@@ -168,10 +227,10 @@ unset($_SESSION["checkout_message"]);
 
     <header class="site-header">
         <a class="site-brand" href="index.php">Olive Tree Soap Co.</a>
-        <!-- shows the order history button if user is logged in, but if not, it shows the register and login button -->
+        <div class="site-links">
             <a class="site-cart-link" href="cart.php">View Cart</a>
 
-            <?php if (!empty($_SESSION["user_name"])): ?>
+            <?php if ($loggedInUserName): ?>
 
                 <a class="site-link" href="order_history.php">
                     Order History
@@ -182,7 +241,7 @@ unset($_SESSION["checkout_message"]);
                 </a>
 
                 <span class="site-user-note">
-                    Hi, <?= htmlspecialchars($_SESSION["user_name"]) ?>
+                    Hi, <?= htmlspecialchars($loggedInUserName) ?>
                 </span>
 
             <?php else: ?>
@@ -204,6 +263,12 @@ unset($_SESSION["checkout_message"]);
         <a class="back-link" href="cart.php">
             &larr; Back to Cart
         </a>
+
+        <?php if (!$loggedInUserName): ?>
+            <div class="cart-message">
+                Please log in to complete checkout and save your order.
+            </div>
+        <?php endif; ?>
 
         <?php if ($orderPlaced): ?>
 
@@ -256,6 +321,8 @@ unset($_SESSION["checkout_message"]);
             </section>
 
             <!-- This form collects the details needed to place the order. -->
+            <?php if ($loggedInUserName): ?>
+
             <form class="product-form" action="checkout.php" method="post">
 
                 <div class="option-group">
@@ -285,6 +352,14 @@ unset($_SESSION["checkout_message"]);
                 </div>
 
             </form>
+
+            <?php else: ?>
+
+            <p>
+                <a class="button-link" href="login.php">Log in to checkout</a>
+            </p>
+
+            <?php endif; ?>
 
         <?php endif; ?>
 

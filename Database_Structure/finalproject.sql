@@ -227,6 +227,44 @@ ALTER TABLE `categories`
 ALTER TABLE `orders`
   MODIFY `order_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
 
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `order_items`
+--
+
+CREATE TABLE `order_items` (
+  `order_item_id` int(10) UNSIGNED NOT NULL,
+  `order_id` int(10) UNSIGNED NOT NULL,
+  `user_id` int(10) UNSIGNED NOT NULL,
+  `order_number` varchar(30) NOT NULL,
+  `product_id` int(10) UNSIGNED NOT NULL,
+  `product_name` varchar(150) NOT NULL,
+  `category_name` varchar(100) NOT NULL,
+  `unit_price_cents` int(10) UNSIGNED NOT NULL,
+  `quantity` int(10) UNSIGNED NOT NULL,
+  `line_total_cents` int(10) UNSIGNED NOT NULL,
+  `options_json` longtext NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Indexes for table `order_items`
+--
+
+ALTER TABLE `order_items`
+  ADD PRIMARY KEY (`order_item_id`),
+  ADD KEY `idx_order_items_order_id` (`order_id`),
+  ADD KEY `idx_order_items_user_id` (`user_id`),
+  ADD KEY `idx_order_items_order_number` (`order_number`);
+
+--
+-- AUTO_INCREMENT for table `order_items`
+--
+
+ALTER TABLE `order_items`
+  MODIFY `order_item_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+
 --
 -- AUTO_INCREMENT for table `products`
 --
