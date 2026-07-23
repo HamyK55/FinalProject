@@ -7,8 +7,13 @@ session_start();
 
 require_once "database/db.php";
 
+// if the user is already logged in, send them to the order history page
 if (isset($_SESSION["user_id"])) {
-    header("Location: order_history.php");
+    if (($_SESSION["user_role"] ?? "") === "admin") {
+        header("Location: admin/dashboard.php");
+    } else {
+        header("Location: order_history.php");
+    }
     exit;
 }
 
@@ -60,7 +65,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $_SESSION["user_email"] = $user["email"];
             $_SESSION["user_role"] = $user["role"];
 
-            header("Location: order_history.php");
+            if ($user["role"] === "admin") {
+                header("Location: admin/dashboard.php");
+            } else {
+                header("Location: order_history.php");
+            }
             exit;
         }
 

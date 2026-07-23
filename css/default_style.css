@@ -21,17 +21,6 @@ body {
     box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
 }
 
-.site-brand {
-    color: #333;
-    font-size: 1.2rem;
-    font-weight: bold;
-    text-decoration: none;
-}
-
-.site-brand:hover {
-    color: #68794c;
-}
-
 .site-cart-link {
     display: inline-block;
     padding: 10px 14px;
@@ -238,6 +227,53 @@ select {
 
 .order-card h2 {
     margin-top: 0;
+}
+
+/* Admin dashboard and placeholder pages. */
+.admin-panel {
+    max-width: 1100px;
+    margin: 30px auto;
+    padding: 30px;
+    border-radius: 12px;
+    background-color: white;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.1);
+}
+
+.admin-panel p {
+    max-width: 700px;
+}
+
+/* Adjusting existing styles for the admin pages */
+.admin-page .site-header {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.admin-page .site-brand {
+    display: block;
+    width: 100%;
+}
+
+.admin-page .site-links {
+    justify-content: center;
+    width: 100%;
+}
+
+.admin-page .admin-panel {
+    text-align: center;
+}
+
+.admin-page .admin-panel p {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.admin-placeholder {
+    margin-top: 24px;
+    padding: 20px;
+    border-radius: 10px;
+    background-color: #f7f4ec;
 }
 
 /* Shopping cart page styles. */
