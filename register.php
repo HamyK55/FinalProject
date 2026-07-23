@@ -104,7 +104,7 @@ $loggedInUserName = $_SESSION["user_name"] ?? null;
 <body>
 
     <header class="site-header">
-        <a class="site-brand" href="index.php">Olive Tree Soap Co.</a>
+        <a class="site-link" href="index.php">Olive Tree Soap Co.</a>
 
         <div class="site-links">
             <a class="site-cart-link" href="cart.php">View Cart</a>

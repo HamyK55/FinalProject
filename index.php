@@ -38,7 +38,7 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <body>
 
     <header class="site-header">
-        <a class="site-brand" href="index.php">
+        <a class="site-link" href="index.php">
             Olive Tree Soap Co.
         </a>
 
