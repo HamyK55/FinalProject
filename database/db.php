@@ -1,9 +1,17 @@
 <?php
 
-$host = "localhost";
-$dbname = "finalproject"; 
-$username = "root";
-$password = "";              // Usually blank in a default XAMPP setup
+$dbConfigPath = __DIR__ . "/db_config.php";
+
+if (!file_exists($dbConfigPath)) {
+    die("Database configuration file is missing.");
+}
+
+$dbConfig = require $dbConfigPath;
+
+$host = $dbConfig["host"];
+$dbname = $dbConfig["dbname"];
+$username = $dbConfig["username"];
+$password = $dbConfig["password"];
 
 
 try {
