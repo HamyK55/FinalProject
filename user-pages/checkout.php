@@ -1,10 +1,8 @@
 <?php
-/*
- * Start the session so the page can read the shopper's cart.
- */
+
 session_start();
 
-require_once "database/db.php";
+require_once "../database/db.php";
 
 if (!isset($_SESSION["cart"])) {
     $_SESSION["cart"] = [];
@@ -18,9 +16,6 @@ if (count($_SESSION["cart"]) === 0) {
 $userId = (int) ($_SESSION["user_id"] ?? 0);
 $loggedInUserName = $_SESSION["user_name"] ?? null;
 
-/*
- * Work out the cart total and count how many items are inside it.
- */
 $cartSubtotalCents = 0;
 $totalItemQuantity = 0;
 $cartQuantitiesByProduct = [];
@@ -36,19 +31,12 @@ foreach ($_SESSION["cart"] as $item) {
     $cartQuantitiesByProduct[$item["product_id"]] += $item["quantity"];
 }
 
-
-/*
- * Set up the checkout result before the form is submitted.
- */
 $orderPlaced = false;
 $orderNumber = null;
-$orderError = null;
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     if ($userId <= 0) {
-        $_SESSION["checkout_message"] =
-            "Please log in before placing your order.";
-
+        $_SESSION["checkout_message"] = "Please log in before placing your order.";
         header("Location: checkout.php");
         exit;
     }
@@ -57,27 +45,14 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $email = trim($_POST["email"] ?? "");
     $address = trim($_POST["address"] ?? "");
 
-    /*
-     * Make sure the shopper filled in the important details.
-     */
     if ($name === "" || $email === "" || $address === "") {
-        $_SESSION["checkout_message"] =
-            "Please fill in all checkout details.";
-
+        $_SESSION["checkout_message"] = "Please fill in all checkout details.";
         header("Location: checkout.php");
         exit;
     }
 
+    $orderNumber = sprintf("ORD-%s-%04d", date("YmdHis"), random_int(0, 9999));
 
-    $orderNumber = sprintf(
-        "ORD-%s-%04d",
-        date("YmdHis"),
-        random_int(0, 9999)
-    );
-
-    /*
-     * Craft sql command to insert the order into the database.
-     */
     try {
         $connection->beginTransaction();
 
@@ -101,9 +76,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             )
         ";
 
-        /*
-         * Save the order details into the database. Associate the order with the signed in shopper.
-         */
         $orderStatement = $connection->prepare($orderSql);
         $orderStatement->execute([
             "user_id" => $userId,
@@ -155,28 +127,13 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 "category_name" => $item["category_name"],
                 "unit_price_cents" => (int) $item["unit_price_cents"],
                 "quantity" => (int) $item["quantity"],
-                "line_total_cents" =>
-                    (int) $item["unit_price_cents"] * (int) $item["quantity"],
-                "options_json" => json_encode(
-                    $item["options"],
-                    JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES
-                )
+                "line_total_cents" => (int) $item["unit_price_cents"] * (int) $item["quantity"],
+                "options_json" => json_encode($item["options"], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)
             ]);
         }
 
-        $stockStatement = $connection->prepare(
-            "
-            UPDATE products
-            SET stock = stock - :quantity
-            WHERE product_id = :product_id
-              AND stock >= :quantity
-              AND is_active = 1
-        "
-        );
+        $stockStatement = $connection->prepare("\n            UPDATE products\n            SET stock = stock - :quantity\n            WHERE product_id = :product_id\n              AND stock >= :quantity\n              AND is_active = 1\n        ");
 
-        /*
-         * Reduce stock for every product in the cart.
-         */
         foreach ($cartQuantitiesByProduct as $productId => $quantity) {
             $stockStatement->execute([
                 "product_id" => (int) $productId,
@@ -184,10 +141,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             ]);
 
             if ($stockStatement->rowCount() === 0) {
-                throw new PDOException(
-                    "Not enough stock available for product ID " .
-                    (int) $productId
-                );
+                throw new PDOException("Not enough stock available for product ID " . (int) $productId);
             }
         }
 
@@ -200,13 +154,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $connection->rollBack();
         }
 
-        /*
-         * Show a simple message if the order could not be saved.
-         */
-        $orderError =
-            "We could not save your order right now. Please try again.";
-
-        $_SESSION["checkout_message"] = $orderError;
+        $_SESSION["checkout_message"] = "We could not save your order right now. Please try again.";
     }
 }
 
@@ -221,144 +169,77 @@ unset($_SESSION["checkout_message"]);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Complete your Olive Tree Soap Co. order.">
     <title>Checkout | Olive Tree Soap Co.</title>
-    <link rel="stylesheet" href="css/default_style.css">
+    <link rel="stylesheet" href="../css/default_style.css">
 </head>
 <body>
 
     <header class="site-header">
-        <a class="site-link" href="index.php">Olive Tree Soap Co.</a>
+        <a class="site-link" href="../index.php">Olive Tree Soap Co.</a>
         <div class="site-links">
             <a class="site-cart-link" href="cart.php">View Cart</a>
-
             <?php if ($loggedInUserName): ?>
-
-                <a class="site-link" href="order_history.php">
-                    Order History
-                </a>
-
-                <a class="site-link" href="logout.php">
-                    Logout
-                </a>
-
-                <span class="site-user-note">
-                    Hi, <?= htmlspecialchars($loggedInUserName) ?>
-                </span>
-
+                <a class="site-link" href="order_history.php">Order History</a>
+                <a class="site-link" href="logout.php">Logout</a>
+                <span class="site-user-note">Hi, <?= htmlspecialchars($loggedInUserName) ?></span>
             <?php else: ?>
-
-                <a class="site-link" href="login.php">
-                    Login
-                </a>
-
-                <a class="site-link" href="register.php">
-                    Register
-                </a>
-
+                <a class="site-link" href="login.php">Login</a>
+                <a class="site-link" href="register.php">Register</a>
             <?php endif; ?>
         </div>
     </header>
 
     <main class="product-details">
 
-        <a class="back-link" href="cart.php">
-            &larr; Back to Cart
-        </a>
+        <a class="back-link" href="cart.php">&larr; Back to Cart</a>
 
         <?php if (!$loggedInUserName): ?>
-            <div class="cart-message">
-                Please log in to complete checkout and save your order.
-            </div>
+            <div class="cart-message">Please log in to complete checkout and save your order.</div>
         <?php endif; ?>
 
         <?php if ($orderPlaced): ?>
-
             <h1>Order Complete</h1>
-
-            <p>
-                Thank you for your order. Your order number is
-                <strong>#<?= htmlspecialchars($orderNumber) ?></strong>.
-            </p>
-
-            <p>
-                Your cart has been cleared and your order has been received.
-            </p>
-
-            <a class="button-link" href="index.php">
-                Return to Shop
-            </a>
-
+            <p>Thank you for your order. Your order number is <strong>#<?= htmlspecialchars($orderNumber) ?></strong>.</p>
+            <p>Your cart has been cleared and your order has been received.</p>
+            <a class="button-link" href="../index.php">Return to Shop</a>
         <?php else: ?>
-
             <h1>Checkout</h1>
 
             <?php if ($checkoutMessage): ?>
-                <div class="cart-message">
-                    <?= htmlspecialchars($checkoutMessage) ?>
-                </div>
+                <div class="cart-message"><?= htmlspecialchars($checkoutMessage) ?></div>
             <?php endif; ?>
 
-            <p>
-                You have <?= (int) $totalItemQuantity ?> item(s) in your cart.
-                Subtotal: $<?= number_format($cartSubtotalCents / 100, 2) ?>
-            </p>
+            <p>You have <?= (int) $totalItemQuantity ?> item(s) in your cart. Subtotal: $<?= number_format($cartSubtotalCents / 100, 2) ?></p>
 
-            <!-- List the items the shopper is about to buy. -->
             <section class="checkout-items">
                 <h2>Your Order</h2>
-
                 <ul>
                     <?php foreach ($_SESSION["cart"] as $item): ?>
-                        <li>
-                            <?= htmlspecialchars($item["product_name"]) ?>
-                            x <?= (int) $item["quantity"] ?>
-                            - $<?= number_format(
-                                ($item["unit_price_cents"] * $item["quantity"]) / 100,
-                                2
-                            ) ?>
-                        </li>
+                        <li><?= htmlspecialchars($item["product_name"]) ?> x <?= (int) $item["quantity"] ?> - $<?= number_format(($item["unit_price_cents"] * $item["quantity"]) / 100, 2) ?></li>
                     <?php endforeach; ?>
                 </ul>
             </section>
 
-            <!-- This form collects the details needed to place the order. -->
             <?php if ($loggedInUserName): ?>
-
             <form class="product-form" action="checkout.php" method="post">
-
                 <div class="option-group">
                     <label for="full_name">Full Name</label>
                     <input id="full_name" type="text" name="full_name" required>
                 </div>
-
                 <div class="option-group">
                     <label for="email">Email Address</label>
                     <input id="email" type="email" name="email" required>
                 </div>
-
                 <div class="option-group">
                     <label for="address">Shipping Address</label>
                     <textarea id="address" name="address" rows="4" required></textarea>
                 </div>
-
-                <!-- Show the final note and the button to place the order. -->
                 <div class="checkout-summary">
-                    <p class="checkout-note">
-                        Payment will be handled after this simple demo checkout.
-                    </p>
-
-                    <button class="add-to-cart" type="submit">
-                        Place Order
-                    </button>
+                    <p class="checkout-note">Payment will be handled after this simple demo checkout.</p>
+                    <button class="add-to-cart" type="submit">Place Order</button>
                 </div>
-
             </form>
-
             <?php else: ?>
-
-            <p>
-                <a class="button-link" href="login.php">Log in to checkout</a>
-            </p>
-
+            <p><a class="button-link" href="login.php">Log in to checkout</a></p>
             <?php endif; ?>
 
         <?php endif; ?>

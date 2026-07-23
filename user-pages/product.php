@@ -2,13 +2,10 @@
 
 session_start();
 
-require_once "database/db.php";
+require_once "../database/db.php";
 
 $loggedInUserName = $_SESSION["user_name"] ?? null;
 
-/*
- * Get the product ID from the URL.
- */
 $productId = filter_input(
     INPUT_GET,
     "id",
@@ -20,9 +17,6 @@ if (!$productId) {
     die("Invalid product ID.");
 }
 
-/*
- * Retrieve the selected product.
- */
 $sql = "
     SELECT
         products.product_id,
@@ -37,15 +31,12 @@ $sql = "
     WHERE products.product_id = :product_id
       AND products.is_active = 1
 ";
-//turns sql into prepared statement
-$stmt = $connection->prepare($sql);
 
-//adds in live product id 
+$stmt = $connection->prepare($sql);
 $stmt->execute([
     "product_id" => $productId
 ]);
 
-// Get Product Details into an array that we can use later
 $product = $stmt->fetch(PDO::FETCH_ASSOC);
 
 if (!$product) {
@@ -53,9 +44,6 @@ if (!$product) {
     die("Product not found.");
 }
 
-/*
- * Retrieve the options for this product.
- */
 $optionSql = "
     SELECT
         option_id,
@@ -68,16 +56,12 @@ $optionSql = "
 ";
 
 $optionStmt = $connection->prepare($optionSql);
-
 $optionStmt->execute([
     "product_id" => $productId
 ]);
 
 $options = $optionStmt->fetchAll(PDO::FETCH_ASSOC);
 
-/*
- * Group option values by option name.
- */
 $optionGroups = [];
 
 foreach ($options as $option) {
@@ -89,22 +73,18 @@ foreach ($options as $option) {
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>
         <?= htmlspecialchars($product["product_name"]) ?>
     </title>
-    <link rel="stylesheet" href="css/default_style.css">
+    <link rel="stylesheet" href="../css/default_style.css">
 </head>
 
 <body>
 
     <header class="site-header">
-        <a class="site-link" href="index.php">
+        <a class="site-link" href="../index.php">
             Olive Tree Soap Co.
         </a>
 
@@ -141,10 +121,9 @@ foreach ($options as $option) {
         </div>
     </header>
 
-    <!-- Main product Detail card, populate page with uptodate info directly from database $product [field name]-->
     <main class="product-details">
 
-        <a class="back-link" href="index.php">
+        <a class="back-link" href="../index.php">
             &larr; Back to Products
         </a>
 
@@ -176,10 +155,8 @@ foreach ($options as $option) {
             <input type="hidden" name="action" value="add">
             <input type="hidden" name="product_id" value="<?= (int) $productId ?>">
 
-            <!-- Create option groups based on number of options in database, will make more if new options are added -->
             <?php foreach ($optionGroups as $optionName => $values): ?>
 
-                <!-- Render one dropdown for each option group from the database. -->
                 <div class="option-group">
 
                     <label>
@@ -190,23 +167,14 @@ foreach ($options as $option) {
 
                         <?php foreach ($values as $option): ?>
 
-                            <!-- Store the option ID for form use and the price change for JavaScript. -->
                             <option
                                 value="<?= (int) $option["option_id"] ?>"
-                                data-adjustment="<?=
-                                    htmlspecialchars(
-                                        $option["price_adjustment"]
-                                    )
-                                ?>"
+                                data-adjustment="<?= htmlspecialchars($option["price_adjustment"]) ?>"
                             >
                                 <?= htmlspecialchars($option["option_value"]) ?>
 
-                                <!-- Show the extra cost only when this choice adds to the base price. -->
                                 <?php if ($option["price_adjustment"] > 0): ?>
-                                    (+$<?= number_format(
-                                        $option["price_adjustment"],
-                                        2
-                                    ) ?>)
+                                    (+$<?= number_format($option["price_adjustment"], 2) ?>)
                                 <?php endif; ?>
                             </option>
 
@@ -233,41 +201,25 @@ foreach ($options as $option) {
     </main>
 
     <script>
-        // Start with the product's base price from PHP.
-        const basePrice =
-            <?= json_encode((float) $product["base_price"]) ?>;
+        const basePrice = <?= json_encode((float) $product["base_price"]) ?>;
+        const optionMenus = document.querySelectorAll(".product-option");
+        const displayPrice = document.getElementById("display-price");
 
-        // Collect every option dropdown on the page.
-        const optionMenus =
-            document.querySelectorAll(".product-option");
-
-        // This is the element that shows the live calculated price.
-        const displayPrice =
-            document.getElementById("display-price");
-
-        // Recalculate the total by adding each selected option's price adjustment.
         function updatePrice() {
             let updatedPrice = basePrice;
 
             optionMenus.forEach(function (menu) {
-                const selectedOption =
-                    menu.options[menu.selectedIndex];
-
-                updatedPrice += Number(
-                    selectedOption.dataset.adjustment
-                );
+                const selectedOption = menu.options[menu.selectedIndex];
+                updatedPrice += Number(selectedOption.dataset.adjustment);
             });
 
-            displayPrice.textContent =
-                "$" + updatedPrice.toFixed(2);
+            displayPrice.textContent = "$" + updatedPrice.toFixed(2);
         }
 
-        // listen for an update in the options and then Update the price 
         optionMenus.forEach(function (menu) {
             menu.addEventListener("change", updatePrice);
         });
 
-        // Run once on page load so the displayed price starts in sync.
         updatePrice();
     </script>
 
