@@ -8,6 +8,19 @@ if (!isset($_SESSION["cart"])) {
     $_SESSION["cart"] = [];
 }
 
+/*
+ * Checkout page overview
+ * ---------------------
+ * This page renders a simple checkout form and processes order submissions.
+ * Server-side responsibilities:
+ *  - Ensure the cart is not empty and the user is logged in before placing an order.
+ *  - Validate submitted checkout fields (name, email, address).
+ *  - Create an order and associated order_items inside a single database transaction. Info is retrieved from the session cart.
+ *  - Deduct stock for ordered products, failing the transaction if any product lacks sufficient stock.
+ *  - Clear the session cart on success and display an order confirmation.
+ *  - On failure, roll back and show a friendly error message.
+ */
+
 if (count($_SESSION["cart"]) === 0) {
     header("Location: cart.php");
     exit;
@@ -35,12 +48,14 @@ $orderPlaced = false;
 $orderNumber = null;
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    // Ensure the user is logged in before attempting to place an order
     if ($userId <= 0) {
         $_SESSION["checkout_message"] = "Please log in before placing your order.";
         header("Location: checkout.php");
         exit;
     }
 
+    // Validate required checkout fields
     $name = trim($_POST["full_name"] ?? "");
     $email = trim($_POST["email"] ?? "");
     $address = trim($_POST["address"] ?? "");
@@ -51,11 +66,15 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         exit;
     }
 
+    // Generate a human-readable order number for confirmation and records
     $orderNumber = sprintf("ORD-%s-%04d", date("YmdHis"), random_int(0, 9999));
 
     try {
+        // Begin a single transaction that will create the order, order items and decrement stock.
+        // If any step fails (insert or stock update), the transaction will be rolled back.
         $connection->beginTransaction();
 
+        // Insert the top-level order record
         $orderSql = "
             INSERT INTO orders (
                 user_id,
@@ -89,6 +108,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
         $orderId = (int) $connection->lastInsertId();
 
+        // Insert each cart item as an order_items row
         $orderItemSql = "
             INSERT INTO order_items (
                 order_id,
@@ -132,6 +152,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             ]);
         }
 
+        // Decrement stock for each product. The WHERE clause ensures we only update when enough stock exists.
+        // If rowCount() is 0 after executing, it means not enough stock was available and we must abort.
         $stockStatement = $connection->prepare("\n            UPDATE products\n            SET stock = stock - :quantity\n            WHERE product_id = :product_id\n              AND stock >= :quantity\n              AND is_active = 1\n        ");
 
         foreach ($cartQuantitiesByProduct as $productId => $quantity) {
@@ -145,11 +167,14 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             }
         }
 
+        // Commit the transaction when all inserts and stock updates succeed
         $connection->commit();
 
+        // Clear the user's session cart and mark order as placed for the UI
         $_SESSION["cart"] = [];
         $orderPlaced = true;
     } catch (PDOException $error) {
+        // Roll back on any error and show a friendly message without exposing details
         if ($connection->inTransaction()) {
             $connection->rollBack();
         }
@@ -164,6 +189,7 @@ unset($_SESSION["checkout_message"]);
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -171,6 +197,7 @@ unset($_SESSION["checkout_message"]);
     <title>Checkout | Olive Tree Soap Co.</title>
     <link rel="stylesheet" href="../css/default_style.css">
 </head>
+
 <body>
 
     <header class="site-header">
@@ -208,38 +235,42 @@ unset($_SESSION["checkout_message"]);
                 <div class="cart-message"><?= htmlspecialchars($checkoutMessage) ?></div>
             <?php endif; ?>
 
-            <p>You have <?= (int) $totalItemQuantity ?> item(s) in your cart. Subtotal: $<?= number_format($cartSubtotalCents / 100, 2) ?></p>
+            <p>You have <?= (int) $totalItemQuantity ?> item(s) in your cart. Subtotal:
+                $<?= number_format($cartSubtotalCents / 100, 2) ?></p>
 
+            <!-- Order summary: shows items the user is about to purchase with quantities and line totals -->
             <section class="checkout-items">
                 <h2>Your Order</h2>
                 <ul>
                     <?php foreach ($_SESSION["cart"] as $item): ?>
-                        <li><?= htmlspecialchars($item["product_name"]) ?> x <?= (int) $item["quantity"] ?> - $<?= number_format(($item["unit_price_cents"] * $item["quantity"]) / 100, 2) ?></li>
+                        <li><?= htmlspecialchars($item["product_name"]) ?> x <?= (int) $item["quantity"] ?> -
+                            $<?= number_format(($item["unit_price_cents"] * $item["quantity"]) / 100, 2) ?></li>
                     <?php endforeach; ?>
                 </ul>
             </section>
 
             <?php if ($loggedInUserName): ?>
-            <form class="product-form" action="checkout.php" method="post">
-                <div class="option-group">
-                    <label for="full_name">Full Name</label>
-                    <input id="full_name" type="text" name="full_name" required>
-                </div>
-                <div class="option-group">
-                    <label for="email">Email Address</label>
-                    <input id="email" type="email" name="email" required>
-                </div>
-                <div class="option-group">
-                    <label for="address">Shipping Address</label>
-                    <textarea id="address" name="address" rows="4" required></textarea>
-                </div>
-                <div class="checkout-summary">
-                    <p class="checkout-note">Payment will be handled after this simple demo checkout.</p>
-                    <button class="add-to-cart" type="submit">Place Order</button>
-                </div>
-            </form>
+                <!-- Checkout form: collects shipping and contact details and submits to this page -->
+                <form class="product-form" action="checkout.php" method="post">
+                    <div class="option-group">
+                        <label for="full_name">Full Name</label>
+                        <input id="full_name" type="text" name="full_name" required>
+                    </div>
+                    <div class="option-group">
+                        <label for="email">Email Address</label>
+                        <input id="email" type="email" name="email" required>
+                    </div>
+                    <div class="option-group">
+                        <label for="address">Shipping Address</label>
+                        <textarea id="address" name="address" rows="4" required></textarea>
+                    </div>
+                    <div class="checkout-summary">
+                        <p class="checkout-note">Payment will be handled after this simple demo checkout.</p>
+                        <button class="add-to-cart" type="submit">Place Order</button>
+                    </div>
+                </form>
             <?php else: ?>
-            <p><a class="button-link" href="login.php">Log in to checkout</a></p>
+                <p><a class="button-link" href="login.php">Log in to checkout</a></p>
             <?php endif; ?>
 
         <?php endif; ?>
@@ -247,4 +278,5 @@ unset($_SESSION["checkout_message"]);
     </main>
 
 </body>
+
 </html>

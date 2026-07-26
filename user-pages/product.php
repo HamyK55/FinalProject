@@ -1,11 +1,13 @@
 <?php
 
+// Boiler plate setup, same as index.php, but this page is for a single product and will display the product details and options.
 session_start();
 
 require_once "../database/db.php";
 
 $loggedInUserName = $_SESSION["user_name"] ?? null;
 
+// Get the product ID from the query string and validate it as an integer. If it's not valid, return a 400 Bad Request response.
 $productId = filter_input(
     INPUT_GET,
     "id",
@@ -17,6 +19,7 @@ if (!$productId) {
     die("Invalid product ID.");
 }
 
+// Prepare sql query to fetch product details. 
 $sql = "
     SELECT
         products.product_id,
@@ -32,8 +35,11 @@ $sql = "
       AND products.is_active = 1
 ";
 
-$stmt = $connection->prepare($sql);
-$stmt->execute([
+
+// Prepare the query to fetch product details, use the product ID from the query string to get the specific product. If the product is not found, return a 404 Not Found response.
+
+$stmt = $connection->prepare($sql); 
+$stmt->execute([ 
     "product_id" => $productId
 ]);
 
@@ -44,6 +50,7 @@ if (!$product) {
     die("Product not found.");
 }
 
+// Prep sql query to get product options for the specific product. 
 $optionSql = "
     SELECT
         option_id,
@@ -68,9 +75,13 @@ foreach ($options as $option) {
     $optionGroups[$option["option_name"]][] = $option;
 }
 
+// end of php code
 ?>
+
+
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -83,6 +94,7 @@ foreach ($options as $option) {
 
 <body>
 
+    <!-- Html follows similar structure as index.php -->
     <header class="site-header">
         <a class="site-link" href="../index.php">
             Olive Tree Soap Co.
@@ -150,6 +162,7 @@ foreach ($options as $option) {
             In stock: <?= (int) $product["stock"] ?>
         </p>
 
+        <!-- Form to add the product to the cart, with options and quantity. The form will submit to cart.php with the action "add" and the product ID. The options will be sent as an array of option IDs. -->
         <form class="product-form" action="cart.php" method="post">
 
             <input type="hidden" name="action" value="add">
@@ -167,10 +180,8 @@ foreach ($options as $option) {
 
                         <?php foreach ($values as $option): ?>
 
-                            <option
-                                value="<?= (int) $option["option_id"] ?>"
-                                data-adjustment="<?= htmlspecialchars($option["price_adjustment"]) ?>"
-                            >
+                            <option value="<?= (int) $option["option_id"] ?>"
+                                data-adjustment="<?= htmlspecialchars($option["price_adjustment"]) ?>">
                                 <?= htmlspecialchars($option["option_value"]) ?>
 
                                 <?php if ($option["price_adjustment"] > 0): ?>
@@ -200,7 +211,9 @@ foreach ($options as $option) {
 
     </main>
 
+
     <script>
+        <!-- JavaScript to dynamically update the displayed price based on selected options. It listens for changes in the option dropdowns and recalculates the total price accordingly. -->
         const basePrice = <?= json_encode((float) $product["base_price"]) ?>;
         const optionMenus = document.querySelectorAll(".product-option");
         const displayPrice = document.getElementById("display-price");
@@ -224,4 +237,5 @@ foreach ($options as $option) {
     </script>
 
 </body>
+
 </html>

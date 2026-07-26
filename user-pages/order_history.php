@@ -8,6 +8,15 @@ $loggedInUserName = $_SESSION["user_name"] ?? null;
 $loggedInUserId = (int) ($_SESSION["user_id"] ?? 0);
 $orders = [];
 
+/*
+ * Order history page - responsibilities
+ * ------------------------------------
+ * - If a user is logged in, load their orders and associated order items from the database.
+ * - Group order_items by order_id for easier rendering below.
+ * - Render a simple list of orders and the items in each order, or show helpful messages
+ *   when the user is not logged in or has no orders.
+ */
+
 if ($loggedInUserId > 0) {
     $ordersSql = "
         SELECT
@@ -25,6 +34,7 @@ if ($loggedInUserId > 0) {
     ";
 
     $ordersStatement = $connection->prepare($ordersSql);
+    // Execute prepared statement to fetch the user's top-level order records
     $ordersStatement->execute(["user_id" => $loggedInUserId]);
     $orders = $ordersStatement->fetchAll(PDO::FETCH_ASSOC);
 }
@@ -51,8 +61,10 @@ if ($loggedInUserId > 0 && count($orders) > 0) {
     ";
 
     $orderItemsStatement = $connection->prepare($orderItemsSql);
+    // Fetch all order_items for the user's orders in one query using positional placeholders
     $orderItemsStatement->execute(array_merge([$loggedInUserId], $orderIds));
 
+    // Group returned items by order_id so the template can render them under each order
     foreach ($orderItemsStatement->fetchAll(PDO::FETCH_ASSOC) as $item) {
         $orderItemsByOrderId[(int) $item["order_id"]][] = $item;
     }
@@ -61,12 +73,14 @@ if ($loggedInUserId > 0 && count($orders) > 0) {
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Order History | Olive Tree Soap Co.</title>
     <link rel="stylesheet" href="../css/default_style.css">
 </head>
+
 <body>
 
     <header class="site-header">
@@ -89,7 +103,8 @@ if ($loggedInUserId > 0 && count($orders) > 0) {
 
         <?php if (!$loggedInUserId): ?>
             <div class="cart-message">Please log in to see your saved orders.</div>
-            <p><a class="site-link" href="login.php">Login here</a> or <a class="site-link" href="register.php">create an account</a>.</p>
+            <p><a class="site-link" href="login.php">Login here</a> or <a class="site-link" href="register.php">create an
+                    account</a>.</p>
         <?php elseif (count($orders) === 0): ?>
             <div class="empty-cart">
                 <h2>No orders yet</h2>
@@ -107,12 +122,14 @@ if ($loggedInUserId > 0 && count($orders) > 0) {
                             <ul>
                                 <?php foreach ($orderItemsByOrderId[(int) $order["order_id"]] as $item): ?>
                                     <li>
-                                        <?= htmlspecialchars($item["product_name"]) ?> x <?= (int) $item["quantity"] ?> - $<?= number_format($item["line_total_cents"] / 100, 2) ?>
+                                        <?= htmlspecialchars($item["product_name"]) ?> x <?= (int) $item["quantity"] ?> -
+                                        $<?= number_format($item["line_total_cents"] / 100, 2) ?>
                                         <?php $itemOptions = json_decode($item["options_json"], true); ?>
                                         <?php if (is_array($itemOptions) && count($itemOptions) > 0): ?>
                                             <ul>
                                                 <?php foreach ($itemOptions as $option): ?>
-                                                    <li><?= htmlspecialchars($option["option_name"] ?? "Option") ?>: <?= htmlspecialchars($option["option_value"] ?? "") ?></li>
+                                                    <li><?= htmlspecialchars($option["option_name"] ?? "Option") ?>:
+                                                        <?= htmlspecialchars($option["option_value"] ?? "") ?></li>
                                                 <?php endforeach; ?>
                                             </ul>
                                         <?php endif; ?>
@@ -128,4 +145,5 @@ if ($loggedInUserId > 0 && count($orders) > 0) {
     </main>
 
 </body>
+
 </html>

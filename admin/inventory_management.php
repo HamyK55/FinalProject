@@ -12,12 +12,14 @@ $adminName = $_SESSION["user_name"] ?? "Admin";
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inventory Management | Olive Tree Soap Co.</title>
     <link rel="stylesheet" href="../css/default_style.css">
 </head>
+
 <body class="admin-page">
 
     <header class="site-header">
@@ -38,4 +40,5 @@ $adminName = $_SESSION["user_name"] ?? "Admin";
     </main>
 
 </body>
+
 </html>

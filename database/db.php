@@ -23,6 +23,6 @@ try {
     );
     // Set the error mode to exception, so whenever we use the connection, it will throw an error and we can handle it with try catch in each file
     $connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-} catch (PDOException $error) { 
+} catch (PDOException $error) {
     die("Database connection failed: " . $error->getMessage());
 }

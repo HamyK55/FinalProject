@@ -4,6 +4,19 @@ session_start();
 
 require_once "../database/db.php";
 
+/*
+ * Register page responsibilities
+ * ----------------------------
+ * - Prevent access for already-authenticated users by redirecting them to their landing page.
+ * - On POST, validate the submitted sign-up fields, ensure passwords match, and check for
+ *   existing users with the same email.
+ * - Create a new user record with a hashed password, sign them in by populating session values,
+ *   and redirect to their order history.
+ * - Provide generic user-facing messages for validation failures to avoid leaking sensitive info.
+ */
+
+
+// Redirect already-signed-in users to the appropriate page
 if (isset($_SESSION["user_id"])) {
     if (($_SESSION["user_role"] ?? "") === "admin") {
         header("Location: ../admin/dashboard.php");
@@ -18,6 +31,7 @@ $firstName = "";
 $lastName = "";
 $email = "";
 
+// Handle form submission: validate, check duplicate email, create user, and sign in
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $firstName = trim($_POST["first_name"] ?? "");
     $lastName = trim($_POST["last_name"] ?? "");
@@ -25,11 +39,14 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $password = $_POST["password"] ?? "";
     $confirmPassword = $_POST["confirm_password"] ?? "";
 
+    // Basic validation: ensure required fields are present
     if ($firstName === "" || $lastName === "" || $email === "" || $password === "") {
         $message = "Please fill in all of the sign up details.";
     } elseif ($password !== $confirmPassword) {
+        // Password confirmation mismatch
         $message = "The passwords do not match.";
     } else {
+        // Check whether the email is already registered
         $emailCheckSql = "
             SELECT user_id
             FROM users
@@ -43,8 +60,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $existingUser = $emailCheckStatement->fetch(PDO::FETCH_ASSOC);
 
         if ($existingUser) {
+            // Do not allow duplicate registrations for the same email
             $message = "That email is already being used.";
         } else {
+            // Hash the password and create the new user record
             $passwordHash = password_hash($password, PASSWORD_DEFAULT);
 
             $registerSql = "
@@ -73,6 +92,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 "password_hash" => $passwordHash
             ]);
 
+            // Sign the user in by storing values in session and redirecting
             $_SESSION["user_id"] = (int) $connection->lastInsertId();
             $_SESSION["user_name"] = trim($firstName . " " . $lastName);
             $_SESSION["user_email"] = $email;
@@ -89,12 +109,14 @@ $loggedInUserName = $_SESSION["user_name"] ?? null;
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register | Olive Tree Soap Co.</title>
     <link rel="stylesheet" href="../css/default_style.css">
 </head>
+
 <body>
 
     <header class="site-header">
@@ -114,17 +136,45 @@ $loggedInUserName = $_SESSION["user_name"] ?? null;
 
     <main class="product-details">
         <h1>Register</h1>
-        <?php if ($message): ?><div class="cart-message"><?= htmlspecialchars($message) ?></div><?php endif; ?>
+
+        <!-- Display messages from validation or duplicate-email checks -->
+        <?php if ($message): ?>
+            <div class="cart-message"><?= htmlspecialchars($message) ?></div>
+        <?php endif; ?>
+
+        <!-- Registration form: collects user details and posts back to this page -->
         <form class="product-form" action="register.php" method="post">
-            <div class="option-group"><label for="first_name">First Name</label><input id="first_name" type="text" name="first_name" value="<?= htmlspecialchars($firstName) ?>" required></div>
-            <div class="option-group"><label for="last_name">Last Name</label><input id="last_name" type="text" name="last_name" value="<?= htmlspecialchars($lastName) ?>" required></div>
-            <div class="option-group"><label for="email">Email Address</label><input id="email" type="email" name="email" value="<?= htmlspecialchars($email) ?>" required></div>
-            <div class="option-group"><label for="password">Password</label><input id="password" type="password" name="password" required></div>
-            <div class="option-group"><label for="confirm_password">Confirm Password</label><input id="confirm_password" type="password" name="confirm_password" required></div>
+            <div class="option-group">
+                <label for="first_name">First Name</label>
+                <input id="first_name" type="text" name="first_name" value="<?= htmlspecialchars($firstName) ?>" required>
+            </div>
+
+            <div class="option-group">
+                <label for="last_name">Last Name</label>
+                <input id="last_name" type="text" name="last_name" value="<?= htmlspecialchars($lastName) ?>" required>
+            </div>
+
+            <div class="option-group">
+                <label for="email">Email Address</label>
+                <input id="email" type="email" name="email" value="<?= htmlspecialchars($email) ?>" required>
+            </div>
+
+            <div class="option-group">
+                <label for="password">Password</label>
+                <input id="password" type="password" name="password" required>
+            </div>
+
+            <div class="option-group">
+                <label for="confirm_password">Confirm Password</label>
+                <input id="confirm_password" type="password" name="confirm_password" required>
+            </div>
+
             <button class="add-to-cart" type="submit">Create Account</button>
         </form>
+
         <p>Already have an account? <a class="site-link" href="login.php">Login here</a></p>
     </main>
 
 </body>
+
 </html>

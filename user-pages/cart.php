@@ -1,17 +1,37 @@
 <?php
 
+// Boilerplate code to setup db connection and shared variables in session. 
 session_start();
 
 require_once "../database/db.php";
 $loggedInUserName = $_SESSION["user_name"] ?? null;
 
+// Initialize the cart in the session if it doesn't exist yet. This ensures that we always have a cart array to work with.
 if (!isset($_SESSION["cart"])) {
     $_SESSION["cart"] = [];
 }
 
+/*
+ * Shopping cart POST handler - Summary
+ * ----------------------------------
+ * This section handles all POST requests made to this page (add, clear, remove, update).
+ * Workflow for POST actions:
+ *  1. Read `action` from $_POST and validate required inputs.
+ *  2. For `add`: validate product and options against the database, compute unit price (in cents),
+ *     check stock, and append the item to $_SESSION['cart'].
+ *  3. For `clear`: empty the session cart array.
+ *  4. For `remove` and `update`: validate the provided cart index, then remove or change quantity
+ *     after checking stock in the database.
+ *  5. Each branch sets a user-visible message in `$_SESSION['cart_message']` and uses a
+ *     POST→Redirect→GET pattern (header('Location: cart.php')) to avoid double-submits.
+ */
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $action = $_POST["action"] ?? "";
 
+    // === Add item to cart ===
+    // Validate incoming product_id and quantity, verify product+options in DB,
+    // compute unit price (base + option adjustments) in cents, ensure stock is available,
+    // then append the item to the session cart and redirect with a message.
     if ($action === "add") {
         $productId = filter_input(INPUT_POST, "product_id", FILTER_VALIDATE_INT);
         $quantity = filter_input(INPUT_POST, "quantity", FILTER_VALIDATE_INT, [
@@ -24,6 +44,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             exit;
         }
 
+        // Fetch product details from the database to validate and get pricing information
         $productSql = "
             SELECT
                 products.product_id,
@@ -56,6 +77,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $selectedOptionIds = array_values(array_unique(array_map("intval", $selectedOptionIds)));
         $optionRows = [];
 
+        // 
         if (count($selectedOptionIds) > 0) {
             $placeholders = implode(", ", array_fill(0, count($selectedOptionIds), "?"));
 
@@ -119,6 +141,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         exit;
     }
 
+    // === Clear cart ===
+    // Remove all items from the session cart and redirect with a status message.
     if ($action === "clear") {
         $_SESSION["cart"] = [];
         $_SESSION["cart_message"] = "Your shopping cart was cleared.";
@@ -130,12 +154,16 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         "options" => ["min_range" => 0]
     ]);
 
+    // Validate cart index for remove/update actions: ensure it's a non-negative integer
+    // and that an item exists at that index in the session cart.
     if ($cartIndex === false || !isset($_SESSION["cart"][$cartIndex])) {
         $_SESSION["cart_message"] = "The selected cart item was not found.";
         header("Location: cart.php");
         exit;
     }
 
+    // === Remove item ===
+    // Remove the item at the validated cart index and reindex the session array.
     if ($action === "remove") {
         unset($_SESSION["cart"][$cartIndex]);
         $_SESSION["cart"] = array_values($_SESSION["cart"]);
@@ -144,6 +172,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         exit;
     }
 
+    // === Update quantity ===
+    // Validate new quantity, confirm current product stock from DB, then update
+    // the session cart item's quantity and redirect with a status message.
     if ($action === "update") {
         $quantity = filter_input(INPUT_POST, "quantity", FILTER_VALIDATE_INT, [
             "options" => ["min_range" => 1]
@@ -192,6 +223,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     exit;
 }
 
+
 $cartMessage = $_SESSION["cart_message"] ?? null;
 unset($_SESSION["cart_message"]);
 
@@ -203,10 +235,14 @@ foreach ($_SESSION["cart"] as $item) {
     $cartSubtotalCents += $lineTotalCents;
     $totalItemQuantity += $item["quantity"];
 }
-
 ?>
+
+
+
+
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -214,56 +250,82 @@ foreach ($_SESSION["cart"] as $item) {
     <title>Shopping Cart | Olive Tree Soap Co.</title>
     <link rel="stylesheet" href="../css/default_style.css">
 </head>
+
 <body>
 
     <main class="cart-container">
+
+        <!-- Page header: cart title and continue-shopping link -->
         <div class="cart-header">
             <h1>Shopping Cart (<?= (int) $totalItemQuantity ?>)</h1>
             <a class="button-link" href="../index.php">Continue Shopping</a>
         </div>
 
+        <!-- Status message area: shows the result of the last cart action (add/update/remove/clear) -->
         <?php if ($cartMessage): ?>
             <div class="cart-message"><?= htmlspecialchars($cartMessage) ?></div>
         <?php endif; ?>
 
+        <!-- Empty-cart state: shown when there are no items in the session cart -->
         <?php if (count($_SESSION["cart"]) === 0): ?>
             <section class="empty-cart">
                 <h2>Your cart is empty</h2>
                 <p>Browse our products and add something to your cart.</p>
                 <a class="button-link" href="../index.php">Browse Products</a>
             </section>
+
+        <!-- Cart items list: iterate and display each cart item with controls -->
         <?php else: ?>
             <?php foreach ($_SESSION["cart"] as $cartIndex => $item): ?>
                 <?php $lineTotalCents = $item["unit_price_cents"] * $item["quantity"]; ?>
+
                 <article class="cart-item">
-                    <div>
-                        <h2><a href="product.php?id=<?= (int) $item["product_id"] ?>"><?= htmlspecialchars($item["product_name"]) ?></a></h2>
+                    <!-- Cart item left section: product name, options, unit price -->   
+                    <div class="cart-item-left">
+                        <h2>
+                            <a href="product.php?id=<?= (int) $item["product_id"] ?>"><?= htmlspecialchars($item["product_name"]) ?></a>
+                        </h2>
+
                         <?php if (!empty($item["options"])): ?>
                             <ul class="cart-options">
                                 <?php foreach ($item["options"] as $option): ?>
-                                    <li><strong><?= htmlspecialchars($option["option_name"]) ?>:</strong> <?= htmlspecialchars($option["option_value"]) ?></li>
+                                    <li>
+                                        <strong><?= htmlspecialchars($option["option_name"]) ?>:</strong>
+                                        <?= htmlspecialchars($option["option_value"]) ?>
+                                    </li>
                                 <?php endforeach; ?>
                             </ul>
                         <?php endif; ?>
+
                         <p>Unit price: $<?= number_format($item["unit_price_cents"] / 100, 2) ?></p>
                     </div>
-                    <div>
+                    
+                    <!-- Cart item right controls: form to update quantity or remove the item from the cart -->
+                    <div class="cart-item-right">
                         <form class="quantity-form" action="cart.php" method="post">
                             <input type="hidden" name="cart_index" value="<?= (int) $cartIndex ?>">
-                            <label>Quantity <input class="quantity-input" type="number" name="quantity" min="1" value="<?= (int) $item["quantity"] ?>" required></label>
+                            <label>Quantity
+                                <input class="quantity-input" type="number" name="quantity" min="1"
+                                       value="<?= (int) $item["quantity"] ?>" required>
+                            </label>
                             <button type="submit" name="action" value="update">Update</button>
                             <button class="remove-button" type="submit" name="action" value="remove">Remove</button>
                         </form>
                     </div>
+
                     <p class="cart-price">Line total: $<?= number_format($lineTotalCents / 100, 2) ?></p>
                 </article>
+
             <?php endforeach; ?>
 
+            <!-- Cart summary: totals and actions -->
             <section class="cart-summary">
                 <p>Total cart quantity: <?= (int) $totalItemQuantity ?></p>
                 <p class="cart-total">Subtotal: $<?= number_format($cartSubtotalCents / 100, 2) ?></p>
                 <div class="cart-actions">
-                    <form action="cart.php" method="post"><button class="clear-button" type="submit" name="action" value="clear">Clear Cart</button></form>
+                    <form action="cart.php" method="post">
+                        <button class="clear-button" type="submit" name="action" value="clear">Clear Cart</button>
+                    </form>
                     <a class="button-link" href="checkout.php">Proceed to Checkout</a>
                 </div>
             </section>
@@ -272,4 +334,5 @@ foreach ($_SESSION["cart"] as $item) {
     </main>
 
 </body>
+
 </html>
