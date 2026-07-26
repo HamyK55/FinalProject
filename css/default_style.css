@@ -517,3 +517,80 @@ select {
     .user-management td:nth-of-type(5):before { content: 'Created'; }
     .user-management td:nth-of-type(6):before { content: 'Actions'; }
 }
+
+/* Utility helpers used by admin pages */
+.hidden { display: none; }
+
+/* Order details inside the order management page */
+.order-details ul { margin: 0; padding-left: 18px; }
+.order-details li { margin-bottom: 6px; }
+
+/* Inventory management specifics */
+.inventory-management table input[type="text"],
+.inventory-management table input[type="number"] {
+    padding: 8px 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.inventory-management td { vertical-align: middle; }
+
+.inventory-management .inline-form { margin: 0; }
+
+/* Sales / Admin report styling (used by admin/sales_page.php) */
+.admin-report {
+    max-width: 1100px;
+    margin: 20px auto;
+    padding: 18px;
+    border-radius: 10px;
+    background-color: #f7f4ec;
+    text-align: left;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+}
+.admin-report h2 {
+    margin-top: 0;
+    color: #354026;
+}
+.admin-report p {
+    margin: 6px 0;
+    font-size: 1rem;
+}
+.admin-report table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 12px;
+}
+.admin-report thead th {
+    text-align: left;
+    padding: 10px 12px;
+    background: #f7f6f1;
+    color: #333;
+    font-weight: 600;
+    border-bottom: 1px solid #e9e6db;
+}
+.admin-report tbody td {
+    padding: 10px 12px;
+    border-bottom: 1px solid #eee;
+    vertical-align: middle;
+}
+.admin-report tbody tr:nth-child(odd) { background: #fff; }
+.admin-report tbody tr:nth-child(even) { background: #faf9f6; }
+.admin-report .empty-cart {
+    padding: 18px;
+    border-radius: 8px;
+    background: white;
+}
+.admin-report strong { color: #354026; }
+
+@media (max-width: 700px) {
+    .admin-report table, .admin-report thead, .admin-report tbody, .admin-report th, .admin-report td, .admin-report tr { display: block; }
+    .admin-report thead { display: none; }
+    .admin-report td { padding-left: 50%; position: relative; }
+    .admin-report td:before { position: absolute; left: 12px; top: 10px; width: 45%; white-space: nowrap; font-weight: 600; color: #555; }
+    .admin-report td:nth-of-type(1):before { content: 'Product'; }
+    .admin-report td:nth-of-type(2):before { content: 'Units Sold'; }
+    .admin-report td:nth-of-type(3):before { content: 'Revenue'; }
+    .inventory-management td:before { /* reuse user-management labels for mobile */ }
+}
