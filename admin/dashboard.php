@@ -50,6 +50,7 @@ $adminName = $_SESSION["user_name"] ?? "Admin";
             <a class="site-link" href="site_templates.php">Site Templates</a>
             <a class="site-link" href="sales_page.php">Sales Page</a>
             <a class="site-link" href="inventory_management.php">Inventory Management</a>
+            <a class="site-link" href="add_product.php">Add Product</a>
         </nav>
 
         <section class="admin-placeholder">

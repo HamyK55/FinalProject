@@ -21,10 +21,12 @@ $sql = "
 		products.description,
 		products.base_price,
 		products.stock,
-		categories.category_name
+		categories.category_name,
+		pi.image_path AS image_path
 	FROM products
 	INNER JOIN categories
 		ON products.category_id = categories.category_id
+	LEFT JOIN product_images pi ON products.product_id = pi.product_id AND pi.is_primary = 1
 	WHERE products.is_active = 1
 	ORDER BY categories.category_name, products.product_name
 ";
@@ -109,6 +111,9 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC); // Fetch all the results as an as
 			<?php foreach ($products as $product): ?>
 
 				<article class="product-card">
+					<?php if (!empty($product['image_path'])): ?>
+						<img class="product-image" src="<?= htmlspecialchars($product['image_path']) ?>" alt="<?= htmlspecialchars($product['product_name']) ?>">
+					<?php endif; ?>
 					<p class="category">
 						<?= htmlspecialchars($product["category_name"]) ?>
 					</p>

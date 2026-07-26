@@ -75,6 +75,13 @@ foreach ($options as $option) {
     $optionGroups[$option["option_name"]][] = $option;
 }
 
+// Fetch product images (primary first)
+$imagesStmt = $connection->prepare(
+    "SELECT image_path, alt_text, is_primary FROM product_images WHERE product_id = :product_id ORDER BY is_primary DESC, sort_order ASC"
+);
+$imagesStmt->execute(["product_id" => $productId]);
+$images = $imagesStmt->fetchAll(PDO::FETCH_ASSOC);
+
 // end of php code
 ?>
 
@@ -146,6 +153,21 @@ foreach ($options as $option) {
         <h1>
             <?= htmlspecialchars($product["product_name"]) ?>
         </h1>
+        <!-- Load product image onto screen -->
+        <?php if (!empty($images)): ?>
+            <?php $main = $images[0]; ?>
+            <?php $mainSrc = '../' . ltrim($main['image_path'], '/'); ?>
+            <img id="product-main-image" class="product-main-image" src="<?= htmlspecialchars($mainSrc) ?>" alt="<?= htmlspecialchars($main['alt_text'] ?? $product['product_name']) ?>">
+
+            <?php if (count($images) > 1): ?>
+                <div class="product-gallery">
+                    <?php foreach ($images as $img): ?>
+                        <?php $thumbSrc = '../' . ltrim($img['image_path'], '/'); ?>
+                        <img class="product-thumb" src="<?= htmlspecialchars($thumbSrc) ?>" alt="<?= htmlspecialchars($img['alt_text'] ?? '') ?>">
+                    <?php endforeach; ?>
+                </div>
+            <?php endif; ?>
+        <?php endif; ?>
 
         <p>
             <?= htmlspecialchars($product["description"] ?? "") ?>
@@ -234,6 +256,18 @@ foreach ($options as $option) {
         });
 
         updatePrice();
+
+        // Swap main image when a thumbnail is clicked
+        const thumbs = document.querySelectorAll('.product-thumb');
+        const mainImage = document.getElementById('product-main-image');
+        if (thumbs && mainImage) {
+            thumbs.forEach(t => t.addEventListener('click', function () {
+                mainImage.src = this.src;
+                mainImage.alt = this.alt || mainImage.alt;
+                thumbs.forEach(x => x.classList.remove('selected'));
+                this.classList.add('selected');
+            }));
+        }
     </script>
 
 </body>
