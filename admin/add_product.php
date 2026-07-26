@@ -157,6 +157,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Add Product | Olive Tree Soap Co.</title>
     <link rel="stylesheet" href="../css/default_style.css">
+    <script src="../js/theme-switcher.js" defer></script>
 </head>
 
 <body class="admin-page">

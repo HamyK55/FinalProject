@@ -48,7 +48,16 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC); // Fetch all the results as an as
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 	<title>Our Products</title>
+	<!--
+	The default stylesheet is always loaded. The theme-switcher script checks
+	the site theme configuration and adds another stylesheet when a special
+	theme, such as Christmas or Halloween, is active.
+	-->
 	<link rel="stylesheet" href="css/default_style.css">
+	<script src="js/theme-switcher.js" defer></script>
+	<link rel="stylesheet" href="css/default_style.css">
+
+	<script src="js/theme-switcher.js" defer></script>
 
 </head>
 
@@ -96,8 +105,8 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC); // Fetch all the results as an as
 
 
 	<h1>Our Products</h1>
-	
-	
+
+
 	<!-- Contains all the products available in the store. If no products are available, a message will be displayed instead. -->
 	<main class="product-container">
 
@@ -112,7 +121,8 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC); // Fetch all the results as an as
 
 				<article class="product-card">
 					<?php if (!empty($product['image_path'])): ?>
-						<img class="product-image" src="<?= htmlspecialchars($product['image_path']) ?>" alt="<?= htmlspecialchars($product['product_name']) ?>">
+						<img class="product-image" src="<?= htmlspecialchars($product['image_path']) ?>"
+							alt="<?= htmlspecialchars($product['product_name']) ?>">
 					<?php endif; ?>
 					<p class="category">
 						<?= htmlspecialchars($product["category_name"]) ?>
@@ -137,7 +147,7 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC); // Fetch all the results as an as
 					<?php else: ?>
 						<p class="out-of-stock">Out of stock</p>
 					<?php endif; ?>
-					
+
 					<!-- Generate a unique link to the product page based on the product id -->
 					<a class="view-product" href="user-pages/product.php?id=<?= (int) $product["product_id"] ?>">
 						View Product

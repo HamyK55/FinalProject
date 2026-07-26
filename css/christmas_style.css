@@ -1,0 +1,44 @@
+/* Christmas theme overrides: red and white accents */
+body {
+    background-color: #fff5f5 !important;
+    color: #330000 !important;
+}
+
+.site-header {
+    background-color: #ffffff !important;
+    border: 2px solid #9b111e !important;
+}
+
+.site-link, .site-cart-link, .button-link, .cart-item button, .cart-summary button, .add-to-cart {
+    background-color: #b71c1c !important;
+    color: #fff !important;
+}
+
+.site-link:hover, .site-cart-link:hover, .button-link:hover, .cart-item button:hover, .cart-summary button:hover, .add-to-cart:hover {
+    background-color: #8e0f12 !important;
+}
+
+.product-card {
+    background-color: #fff !important;
+    border: 1px solid #f1a1a1 !important;
+}
+
+.product-main-image {
+    box-shadow: 0 10px 20px rgba(155,17,30,0.12) !important;
+    border: 3px solid rgba(155,17,30,0.18) !important;
+}
+
+.product-thumb.selected { 
+    border-color: #b71c1c !important; 
+    box-shadow: 0 6px 12px rgba(155,17,30,0.08) !important; 
+}
+
+.price { color: #b71c1c !important; }
+
+.admin-panel, .checkout-items, .checkout-summary, .order-card, .product-details {
+    border-color: #f3d6d6 !important;
+}
+
+/* small adjustments for readability */
+.site-user-note { color: #7a0d12 !important; }
+.cart-message { background-color: #fff0f0 !important; border-color: #f2c2c2 !important; }

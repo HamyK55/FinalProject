@@ -1,0 +1,136 @@
+/* Halloween theme: purple & orange accents */
+body {
+    background-color: #1a0b1e !important;
+    color: #f3e9ff !important;
+}
+
+.site-header {
+    background-color: #2a1630 !important;
+    border: 2px solid #8b2b8f !important;
+}
+
+.site-link, .site-cart-link, .button-link, .cart-item button, .cart-summary button, .add-to-cart {
+    background-color: #8b2b8f !important; /* purple */
+    color: #fff !important;
+}
+
+.site-link:hover, .site-cart-link:hover, .button-link:hover, .cart-item button:hover, .cart-summary button:hover, .add-to-cart:hover {
+    background-color: #6e1f6b !important;
+}
+
+.product-card {
+    background-color: #291425 !important;
+    border: 1px solid #3f1736 !important;
+}
+
+.product-main-image {
+    box-shadow: 0 10px 20px rgba(139,43,143,0.12) !important;
+    border: 3px solid rgba(255,140,0,0.08) !important; /* subtle orange border */
+}
+
+.product-thumb.selected { 
+    border-color: #ff8c00 !important; /* orange */
+    box-shadow: 0 6px 12px rgba(139,43,143,0.08) !important; 
+}
+
+.price { color: #ff8c00 !important; }
+
+.admin-panel, .checkout-items, .checkout-summary, .order-card, .product-details {
+    border-color: #3a2036 !important;
+}
+
+/* Make the admin panel match the site's purple header and ensure text is readable */
+.admin-panel {
+    background-color: #2a1630 !important;
+    color: #f3e9ff !important;
+}
+.admin-panel h1,
+.admin-panel h2,
+.admin-panel p {
+    color: #f3e9ff !important;
+}
+
+.site-user-note { color: #ffda9e !important; }
+.cart-message { background-color: #2b142e !important; border-color: #4b1f45 !important; color: #ffdca8 !important; }
+
+/* small readable tweaks for inputs/buttons */
+.user-management .btn-neutral { background-color: #7b2a84 !important; }
+.user-management .btn-danger { background-color: #b33a00 !important; }
+
+/* Ensure links remain visible */
+a { color: #ffdca8 !important; }
+
+/* Replace white backgrounds used by the base stylesheet with darker
+   purple surfaces so pages remain readable under the Halloween theme. */
+.product-card {
+    background-color: #291425 !important;
+    border-color: #3f1736 !important;
+    color: #f3e9ff !important;
+}
+
+.product-details {
+    background-color: #2a1630 !important;
+    box-shadow: 0 3px 12px rgba(0,0,0,0.35) !important;
+    color: #f3e9ff !important;
+}
+
+.product-main-image {
+    /* make the white panel behind images dark so the page looks cohesive */
+    background: #291425 !important;
+    border-color: rgba(255,140,0,0.08) !important;
+}
+
+.cart-item,
+.cart-summary,
+.checkout-items,
+.checkout-summary,
+.empty-cart,
+.order-card {
+    background-color: #291425 !important;
+    border-color: #3f1736 !important;
+    color: #f3e9ff !important;
+}
+
+.user-management table,
+.admin-report .empty-cart,
+.admin-report,
+.admin-report tbody tr:nth-child(odd),
+.admin-report tbody tr:nth-child(even) {
+    background-color: transparent !important;
+    color: #f3e9ff !important;
+}
+
+/* Make table headers readable on dark background */
+.user-management thead th,
+.admin-report thead th {
+    background: rgba(43,22,40,0.6) !important;
+    color: #ffdca8 !important;
+    border-bottom-color: rgba(255,255,255,0.04) !important;
+}
+
+/* Buttons inside dark panels: slightly lighter background for contrast */
+.admin-panel .btn-neutral,
+.admin-panel .btn {
+    background-color: #7b2a84 !important;
+    color: #fff !important;
+}
+
+/* Admin placeholder / welcome card (used on dashboard and site templates) */
+.admin-placeholder {
+    background-color: #2a1630 !important;
+    border: 1px solid #3f1736 !important;
+    color: #f3e9ff !important;
+}
+.admin-placeholder h2,
+.admin-placeholder p {
+    color: #f3e9ff !important;
+}
+
+/* Small status/info messages shown after actions in admin pages */
+.status-message {
+    background-color: #3a2036 !important;
+    border: 1px solid #4b1f45 !important;
+    color: #ffdca8 !important;
+    padding: 10px;
+    border-radius: 6px;
+}

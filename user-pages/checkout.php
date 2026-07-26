@@ -196,6 +196,7 @@ unset($_SESSION["checkout_message"]);
     <meta name="description" content="Complete your Olive Tree Soap Co. order.">
     <title>Checkout | Olive Tree Soap Co.</title>
     <link rel="stylesheet" href="../css/default_style.css">
+    <script src="../js/theme-switcher.js" defer></script>
 </head>
 
 <body>

@@ -249,6 +249,7 @@ foreach ($_SESSION["cart"] as $item) {
     <meta name="description" content="View and update your Olive Tree Soap Co. shopping cart.">
     <title>Shopping Cart | Olive Tree Soap Co.</title>
     <link rel="stylesheet" href="../css/default_style.css">
+    <script src="../js/theme-switcher.js" defer></script>
 </head>
 
 <body>

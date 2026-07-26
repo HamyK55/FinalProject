@@ -97,6 +97,7 @@ $images = $imagesStmt->fetchAll(PDO::FETCH_ASSOC);
         <?= htmlspecialchars($product["product_name"]) ?>
     </title>
     <link rel="stylesheet" href="../css/default_style.css">
+    <script src="../js/theme-switcher.js" defer></script>
 </head>
 
 <body>
