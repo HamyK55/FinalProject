@@ -62,7 +62,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         mkdir($uploadDir, 0755, true);
     }
 
-    // Begin transaction: insert product then images
+    // Begin transaction: insert product, product options, and product images
     try {
         $connection->beginTransaction();
 
@@ -78,6 +78,50 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         ]);
 
         $productId = (int)$connection->lastInsertId();
+
+        // add product options if required
+        $optionRows = [];
+        if (!empty($_POST['option_name']) && is_array($_POST['option_name'])) {
+            $optionNames = $_POST['option_name'] ?? [];
+            $optionValues = $_POST['option_value'] ?? [];
+            $optionAdjustments = $_POST['price_adjustment'] ?? [];
+            $optionSortOrders = $_POST['sort_order'] ?? [];
+            $optionCount = count($optionNames);
+
+            $optionInsert = $connection->prepare(
+                "INSERT INTO product_options (product_id, option_name, option_value, price_adjustment, sort_order) VALUES (:product_id, :option_name, :option_value, :price_adjustment, :sort_order)"
+            );
+
+            // Loop through provided options and insert valid ones
+            for ($i = 0; $i < $optionCount; $i++) {
+                $optionName = trim((string)($optionNames[$i] ?? ''));
+                $optionValue = trim((string)($optionValues[$i] ?? ''));
+
+                if ($optionName === '' || $optionValue === '') {
+                    continue;
+                }
+
+                $adjustmentRaw = trim((string)($optionAdjustments[$i] ?? ''));
+                $adjustment = is_numeric($adjustmentRaw) ? round((float)$adjustmentRaw, 2) : 0.00;
+                $sortOrder = filter_var($optionSortOrders[$i] ?? 0, FILTER_VALIDATE_INT, ['options' => ['min_range' => 0]]);
+                if ($sortOrder === false) {
+                    $sortOrder = 0;
+                }
+
+                $optionInsert->execute([
+                    'product_id' => $productId,
+                    'option_name' => $optionName,
+                    'option_value' => $optionValue,
+                    'price_adjustment' => $adjustment,
+                    'sort_order' => $sortOrder,
+                ]);
+
+                $optionRows[] = [
+                    'name' => $optionName,
+                    'value' => $optionValue,
+                ];
+            }
+        }
 
         // Handle uploaded images (optional)
         $uploadedAny = false;
@@ -136,7 +180,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         $connection->commit();
-        $_SESSION['add_product_message'] = 'Product added successfully.' . ($uploadedAny ? ' Images uploaded.' : ' No images uploaded.');
+        $_SESSION['add_product_message'] = 'Product added successfully.' . ($uploadedAny ? ' Images uploaded.' : ' No images uploaded.') . (!empty($optionRows) ? ' Options saved.' : '');
     } catch (Exception $e) {
         if ($connection->inTransaction()) {
             $connection->rollBack();
@@ -218,6 +262,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
 
             <div class="option-group">
+                <label for="option-rows">Product Options (optional)</label>
+                <p class="checkout-note">Add option groups such as Size or Pack Size, then enter one or more values for each group.</p>
+
+                <div id="option-rows">
+                    <div class="option-entry">
+                        <div class="option-grid">
+                            <label>
+                                Option Name
+                                <input type="text" name="option_name[]" placeholder="e.g. Size">
+                            </label>
+
+                            <label>
+                                Option Value
+                                <input type="text" name="option_value[]" placeholder="e.g. Regular">
+                            </label>
+
+                            <label>
+                                Price Adjustment
+                                <input type="number" step="0.01" min="0" name="price_adjustment[]" value="0">
+                            </label>
+
+                            <label>
+                                Sort Order
+                                <input type="number" name="sort_order[]" min="0" value="0">
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="button" id="add-option-row" class="add-to-cart">Add Another Option</button>
+            </div>
+
+            <div class="option-group">
                 <label for="images">Product Images (multiple allowed)</label>
                 <input id="images" type="file" name="images[]" multiple accept="image/*">
                 <p class="checkout-note">Images will be stored in <strong>images/product_images/</strong>.</p>
@@ -227,6 +304,49 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </form>
 
     </main>
+
+    <template id="option-row-template">
+        <div class="option-entry">
+            <div class="option-grid">
+                <label>
+                    Option Name
+                    <input type="text" name="option_name[]" placeholder="e.g. Size">
+                </label>
+
+                <label>
+                    Option Value
+                    <input type="text" name="option_value[]" placeholder="e.g. Regular">
+                </label>
+
+                <label>
+                    Price Adjustment
+                    <input type="number" step="0.01" min="0" name="price_adjustment[]" value="0">
+                </label>
+
+                <label>
+                    Sort Order
+                    <input type="number" name="sort_order[]" min="0" value="0">
+                </label>
+            </div>
+        </div>
+    </template>
+    
+    <!-- dynamically add option rows for product options if user selects "Add Another Option" -->
+    <script>
+        
+        document.addEventListener('DOMContentLoaded', function () {
+            const rowsContainer = document.getElementById('option-rows');
+            const addButton = document.getElementById('add-option-row');
+            const template = document.getElementById('option-row-template');
+
+            if (addButton && rowsContainer && template) {
+                addButton.addEventListener('click', function () {
+                    const clone = template.content.firstElementChild.cloneNode(true);
+                    rowsContainer.appendChild(clone);
+                });
+            }
+        });
+    </script>
 
 </body>
 
