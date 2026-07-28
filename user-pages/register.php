@@ -113,6 +113,8 @@ $loggedInUserName = $_SESSION["user_name"] ?? null;
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="This is the registration page for the Olive Tree Soap Co.">
+	<meta name="keywords" content="userRegistration, olivetree, soap, skincare, user-signup">
     <title>Register | Olive Tree Soap Co.</title>
     <link rel="stylesheet" href="../css/default_style.css">
     <script src="../js/theme-switcher.js" defer></script>

@@ -193,6 +193,8 @@ unset($_SESSION["checkout_message"]);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Complete your order and submit your cart">
+	<meta name="keywords" content="lipbalm, olivetree, soap, skincare, =checkout, order, submit">
     <meta name="description" content="Complete your Olive Tree Soap Co. order.">
     <title>Checkout | Olive Tree Soap Co.</title>
     <link rel="stylesheet" href="../css/default_style.css">

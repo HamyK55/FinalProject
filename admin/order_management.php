@@ -100,10 +100,12 @@ if (count($orders) > 0) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Manage and fulfill product orders">
+	<meta name="keywords" content="adminpage, olivetree, orders, fulfillment">
     <title>Order Management | Olive Tree Soap Co.</title>
     <link rel="stylesheet" href="../css/default_style.css">
     <script src="../js/theme-switcher.js" defer></script>
-    <meta name="keywords" content="order-management, admin-page">
+    
 </head>
 
 <body class="admin-page">

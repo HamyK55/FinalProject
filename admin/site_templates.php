@@ -78,7 +78,9 @@ unset($_SESSION["theme_message"]);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+    <meta name="description" content="Manage your site styling and appearance">
+	<meta name="keywords" content="adminpage, olivetree, site templates, theme">
+    
     <title>Site Templates | Olive Tree Soap Co.</title>
 
     <!--

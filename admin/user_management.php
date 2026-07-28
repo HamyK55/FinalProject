@@ -91,6 +91,8 @@ $users = $usersStmt->fetchAll(PDO::FETCH_ASSOC);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Manage user accounts and their permissions">
+	<meta name="keywords" content="adminpage, olivetree, user management">
     <title>User Management | Olive Tree Soap Co.</title>
     <link rel="stylesheet" href="../css/default_style.css">
     <script src="../js/theme-switcher.js" defer></script>

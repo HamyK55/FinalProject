@@ -92,7 +92,10 @@ $images = $imagesStmt->fetchAll(PDO::FETCH_ASSOC);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Configure your product and buy it on this page">
+	<meta name="keywords" content="lipbalm, olivetree, soap, skincare, product page">
 
+    <!-- Dynamic page name based on the product name-->
     <title>
         <?= htmlspecialchars($product["product_name"]) ?>
     </title>

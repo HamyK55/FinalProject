@@ -24,9 +24,7 @@ $adminName = $_SESSION["user_name"] ?? "Admin";
 
 require_once __DIR__ . "/../database/db.php";
 
-// -----------------------------------------------------------------
-// Query: Aggregated sold items (only from fulfilled orders)
-// -----------------------------------------------------------------
+// Get sold items only from fulfilled orders)
 $soldSql = <<<'SQL'
     SELECT
         oi.product_id,
@@ -94,6 +92,8 @@ $pendingRows = $pendingByProductStmt->fetchAll(PDO::FETCH_ASSOC);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="View sales data over the lifetime of the store">
+	<meta name="keywords" content="adminpage, olivetree, sales, revenue, orders">
     <title>Sales Page | Olive Tree Soap Co.</title>
     <link rel="stylesheet" href="../css/default_style.css">
     <script src="../js/theme-switcher.js" defer></script>

@@ -78,6 +78,8 @@ if ($loggedInUserId > 0 && count($orders) > 0) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Order History | Olive Tree Soap Co.</title>
+    <meta name="description" content="order history page to see past orders and their details">
+	<meta name="keywords" content="lipbalm, olivetree, soap, skincare, history, pastOrders">
     <link rel="stylesheet" href="../css/default_style.css">
     <script src="../js/theme-switcher.js" defer></script>
 </head>
@@ -101,7 +103,8 @@ if ($loggedInUserId > 0 && count($orders) > 0) {
 
     <main class="product-details">
         <h1>Order History</h1>
-
+        
+        <!-- Show certain links, based on if the user is logged in or not -->
         <?php if (!$loggedInUserId): ?>
             <div class="cart-message">Please log in to see your saved orders.</div>
             <p><a class="site-link" href="login.php">Login here</a> or <a class="site-link" href="register.php">create an

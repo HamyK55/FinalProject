@@ -46,6 +46,8 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC); // Fetch all the results as an as
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="description" content="This page displays all the products in product selection and acts as the home of the app">
+	<meta name="keywords" content="home, olivetree, soap, skincare">
 
 	<title>Our Products</title>
 	<!--
