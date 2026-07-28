@@ -4,9 +4,26 @@ body {
     color: #f3e9ff !important;
 }
 
-.site-header {
+.site-header,
+.admin-panel,
+.product-details,
+.product-card,
+.cart-item,
+.cart-summary,
+.checkout-items,
+.checkout-summary,
+.empty-cart,
+.order-card,
+.admin-placeholder,
+.cart-message,
+.status-message {
     background-color: #2a1630 !important;
+    color: #f3e9ff !important;
+}
+
+.site-header {
     border: 2px solid #8b2b8f !important;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.25) !important;
 }
 
 .site-link, .site-cart-link, .button-link, .cart-item button, .cart-summary button, .add-to-cart {
@@ -70,14 +87,13 @@ a { color: #ffdca8 !important; }
 
 .product-details {
     background-color: #2a1630 !important;
-    box-shadow: 0 3px 12px rgba(0,0,0,0.35) !important;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.35) !important;
     color: #f3e9ff !important;
 }
 
 .product-main-image {
-    /* make the white panel behind images dark so the page looks cohesive */
     background: #291425 !important;
-    border-color: rgba(255,140,0,0.08) !important;
+    border-color: rgba(255, 140, 0, 0.08) !important;
 }
 
 .cart-item,
@@ -96,16 +112,16 @@ a { color: #ffdca8 !important; }
 .admin-report,
 .admin-report tbody tr:nth-child(odd),
 .admin-report tbody tr:nth-child(even) {
-    background-color: transparent !important;
+    background-color: #221124 !important;
     color: #f3e9ff !important;
 }
 
 /* Make table headers readable on dark background */
 .user-management thead th,
 .admin-report thead th {
-    background: rgba(43,22,40,0.6) !important;
+    background: #3a2036 !important;
     color: #ffdca8 !important;
-    border-bottom-color: rgba(255,255,255,0.04) !important;
+    border-bottom-color: rgba(255, 255, 255, 0.08) !important;
 }
 
 /* Buttons inside dark panels: slightly lighter background for contrast */
@@ -133,4 +149,25 @@ a { color: #ffdca8 !important; }
     color: #ffdca8 !important;
     padding: 10px;
     border-radius: 6px;
+}
+
+/* Ensure form fields and inputs also stay readable in the dark theme */
+input,
+textarea,
+select {
+    background-color: #291425 !important;
+    color: #f3e9ff !important;
+    border: 1px solid #4b1f45 !important;
+}
+
+input::placeholder,
+textarea::placeholder {
+    color: #c8a8c9 !important;
+}
+
+/* Darken the individual option containers used on the add-product page */
+.option-group {
+    background-color: #221124 !important;
+    border: 1px solid #4b1f45 !important;
+    color: #f3e9ff !important;
 }

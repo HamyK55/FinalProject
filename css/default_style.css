@@ -301,12 +301,55 @@ select {
 }
 
 .admin-page .admin-panel {
-    text-align: center;
+    text-align: left;
 }
 
-.admin-page .admin-panel p {
-    margin-left: auto;
-    margin-right: auto;
+.admin-page .admin-panel h1 {
+    text-align: left;
+    margin-bottom: 8px;
+}
+
+.admin-page .product-form {
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid #e5e0d5;
+}
+
+.admin-page .product-form .option-group {
+    margin-bottom: 14px;
+    padding: 16px;
+    border: 1px solid #e8dfcf;
+    border-radius: 10px;
+    background-color: #fcfaf6;
+}
+
+.admin-page .product-form .option-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+}
+
+.admin-page .product-form .option-entry + .option-entry {
+    margin-top: 12px;
+}
+
+.admin-page .product-form input[type="text"],
+.admin-page .product-form input[type="email"],
+.admin-page .product-form input[type="password"],
+.admin-page .product-form input[type="number"],
+.admin-page .product-form textarea,
+.admin-page .product-form select {
+    border: 1px solid #d8d0c1;
+    border-radius: 8px;
+}
+
+.admin-page .product-form textarea {
+    min-height: 120px;
+    resize: vertical;
+}
+
+.admin-page .product-form .checkout-note {
+    margin: 6px 0 12px;
 }
 
 .admin-placeholder {
@@ -632,5 +675,4 @@ select {
     .admin-report td:nth-of-type(1):before { content: 'Product'; }
     .admin-report td:nth-of-type(2):before { content: 'Units Sold'; }
     .admin-report td:nth-of-type(3):before { content: 'Revenue'; }
-    .inventory-management td:before { /* reuse user-management labels for mobile */ }
 }
