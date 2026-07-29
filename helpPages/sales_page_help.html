@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Learn how to view sales data and understand the admin sales page in Olive Tree Soap Co.">
+    <meta name="keywords" content="sales page help, sales report, admin help, revenue report">
+    <title>Sales Page Help | Olive Tree Soap Co.</title>
+    <link rel="stylesheet" href="../css/default_style.css">
+    <script src="../js/theme-switcher.js" defer></script>
+
+</head>
+
+<header class="site-header">
+    <span class="site-brand">Olive Tree Soap Co.</span>
+
+    <div class="site-links">
+        <a class="site-link" href="../admin/dashboard.php">Admin Dashboard</a>
+        <a class="site-link" href="help_center.html">Help Center</a>
+        <a class="site-link" href="../user-pages/logout.php">Logout</a>
+
+        <span class="site-user-note">
+            Hi,
+            <?= htmlspecialchars($adminName) ?>
+        </span>
+    </div>
+</header>
+
+<body class="admin-page">
+    <div class="product-details">
+        <h1>Sales Page Help</h1>
+        <p>This page gives a simple sales summary for the store.</p>
+
+        <h2>What the page shows</h2>
+        <ul>
+            <li><strong>Total units sold:</strong> how many items were sold through fulfilled orders.</li>
+            <li><strong>Total revenue:</strong> revenue from fulfilled orders.</li>
+            <li><strong>Pending units and revenue:</strong> items and money tied to orders that are not yet fulfilled.
+            </li>
+        </ul>
+
+        <h2>How to read the report</h2>
+        <ul>
+            <li>Use the <strong>Overview</strong> section to see the overall picture.</li>
+            <li>Use the product breakdowns to see which products are performing well.</li>
+            <li>Use the pending section to spot orders that still need attention.</li>
+        </ul>
+
+        <h2>Tips</h2>
+        <ul>
+            <li>Check this page regularly to track store performance.</li>
+            <li>Review which products are selling the most.</li>
+            <li>Watch pending revenue if you want to understand orders that still need handling.</li>
+        </ul>
+
+       
+    </div>
+</body>
+
+</html>

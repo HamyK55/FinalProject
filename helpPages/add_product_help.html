@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Learn how to add products, set options, and upload images in the Olive Tree Soap Co. admin area">
+    <meta name="keywords" content="add product help, admin help, product options, product images">
+    <title>Add Product Help | Olive Tree Soap Co.</title>
+    <link rel="stylesheet" href="../css/default_style.css">
+    <script src="../js/theme-switcher.js" defer></script>
+
+</head>
+
+<body class="admin-page">
+
+    <header class="site-header">
+        <span class="site-brand">Olive Tree Soap Co.</span>
+
+        <div class="site-links">
+            <a class="site-link" href="../admin/dashboard.php">Admin Dashboard</a>
+            <a class="site-link" href="help_center.html">Help Center</a>
+            <a class="site-link" href="../user-pages/logout.php">Logout</a>
+
+            <span class="site-user-note">
+                Hi,
+                <?= htmlspecialchars($adminName) ?>
+            </span>
+        </div>
+    </header>
+
+    <div class="product-details">
+        <h1>Add Product Help</h1>
+        <p>This page is used to create a new product in the store.</p>
+
+        <h2>What to fill in</h2>
+        <ul>
+            <li><strong>Product Name:</strong> Enter the product title shown to customers.</li>
+            <li><strong>Description:</strong> Add a short description of the item.</li>
+            <li><strong>Category:</strong> Choose the correct category for the product.</li>
+            <li><strong>Base Price:</strong> Enter the starting price for the product.</li>
+            <li><strong>Stock:</strong> Set how many units are available.</li>
+            <li><strong>Active:</strong> Leave this checked if the product should appear on the site.</li>
+        </ul>
+
+        <h2>Adding product options</h2>
+        <div class="checkout-summary">
+            <strong>Important:</strong> If you want multiple choices to appear in the dropdown on the front-end, use the
+            <strong>same Option Name</strong> for each option row.
+        </div>
+        <p>Example:</p>
+        <ul>
+            <li>Row 1: Option Name = <code>Size</code>, Option Value = <code>Regular</code>, Price Adjustment =
+                <code>0.00</code></li>
+            <li>Row 2: Option Name = <code>Size</code>, Option Value = <code>Large</code>, Price Adjustment =
+                <code>3.00</code></li>
+        </ul>
+        <p>This makes the customer see a dropdown called <strong>Size</strong> with the values <strong>Regular</strong>
+            and <strong>Large</strong>.</p>
+
+        <h2>Images</h2>
+        <p>You can upload one or more product images. The first successfully uploaded image is marked as the primary
+            image.</p>
+
+        <h2>Tips</h2>
+        <ul>
+            <li>Use clear option names such as <code>Size</code>, <code>Pack Size</code>, or <code>Color</code>.</li>
+            <li>Use decimal values for price adjustments such as <code>2.50</code>.</li>
+            <li>Use <code>Sort Order</code> to control the display order of options.</li>
+        </ul>
+
+       
+    </div>
+</body>
+
+</html>
