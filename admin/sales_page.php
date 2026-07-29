@@ -106,13 +106,17 @@ $pendingRows = $pendingByProductStmt->fetchAll(PDO::FETCH_ASSOC);
 
         <div class="site-links">
             <a class="site-link" href="dashboard.php">Admin Dashboard</a>
+            <a class="site-link" href="../helpPages/help_center.html">Help Center</a>
             <a class="site-link" href="../user-pages/logout.php">Logout</a>
             <span class="site-user-note">Hi, <?= htmlspecialchars($adminName) ?></span>
         </div>
     </header>
 
     <main class="admin-panel">
-        <h1>Sales Page</h1>
+        <div class="admin-panel-topbar">
+            <h1>Sales Page</h1>
+            <a class="site-link" href="../helpPages/sales_page_help.html">Get Help</a>
+        </div>
         
 
         <section class="admin-report">

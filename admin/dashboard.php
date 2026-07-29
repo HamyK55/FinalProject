@@ -43,7 +43,10 @@ $adminName = $_SESSION["user_name"] ?? "Admin";
     </header>
 
     <main class="admin-panel">
-        <h1>Admin Dashboard</h1>
+        <div class="admin-panel-topbar">
+            <h1>Admin Dashboard</h1>
+            <a class="site-link" href="../helpPages/help_center.html">Get Help</a>
+        </div>
 
         <p>
             Choose a section below.

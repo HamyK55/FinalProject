@@ -178,12 +178,16 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <div class="site-links">
             <a class="site-link" href="dashboard.php">Admin Dashboard</a>
             <a class="site-link" href="../user-pages/logout.php">Logout</a>
+            
             <span class="site-user-note">Hi, <?= htmlspecialchars($adminName) ?></span>
         </div>
     </header>
 
     <main class="admin-panel">
-        <h1>Inventory Management</h1>
+        <div class="admin-panel-topbar">
+            <h1>Inventory Management</h1>
+            <a class="site-link" href="../helpPages/inventory_management_help.html">Get Help</a>
+        </div>
 
         <?php if (!empty($message)): ?>
             <div class="cart-message"><?= htmlspecialchars($message) ?></div>

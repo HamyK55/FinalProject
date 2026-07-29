@@ -1,41 +1,63 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Order Management Help</title>
-  <link rel="stylesheet" href="../css/default_style.css">
-  <script src="../js/theme-switcher.js" defer></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Learn how to review and manage customer orders in the Olive Tree Soap Co. admin area">
+    <meta name="keywords" content="order management help, fulfill orders, admin help, customer orders">
+    <title>Order Management Help | Olive Tree Soap Co.</title>
+    <link rel="stylesheet" href="../css/default_style.css">
+    <script src="../js/theme-switcher.js" defer></script>
 
 </head>
-<body>
-  <div class="product-details">
-    <h1>Order Management Help</h1>
-    <p>This page is used to manage customer orders.</p>
 
-    <h2>How to use it</h2>
-    <ul>
-      <li>Review the list of orders placed by customers.</li>
-      <li>Use the <strong>Fulfill</strong> button once an order has been completed.</li>
-      <li>Use <strong>Cancel</strong> if an order should be removed.</li>
-      <li>Click <strong>Details</strong> to see the items inside an order.</li>
-    </ul>
+<body class="admin-page">
 
-    <h2>Important notes</h2>
-    <ul>
-      <li>When you cancel an order, the order and its items are removed from the system.</li>
-      <li>Fulfilled orders are counted in the sales reports.</li>
-      <li>Pending orders are still visible and can be processed later.</li>
-    </ul>
+    <header class="site-header">
+        <span class="site-brand">Olive Tree Soap Co.</span>
 
-    <h2>Recommended workflow</h2>
-    <ul>
-      <li>Check orders daily.</li>
-      <li>Fulfill completed orders quickly.</li>
-      <li>Cancel only if the order is invalid or no longer needed.</li>
-    </ul>
+        <div class="site-links">
+            <a class="site-link" href="../admin/dashboard.php">Admin Dashboard</a>
+            <a class="site-link" href="help_center.html">Help Center</a>
+            <a class="site-link" href="../user-pages/logout.php">Logout</a>
 
-    <p><a href="sales_page_help.html">Next: Sales Page Help</a></p>
-  </div>
+            <span class="site-user-note">
+                Hi,
+                <?= htmlspecialchars($adminName) ?>
+            </span>
+        </div>
+    </header>
+
+    <div class="product-details">
+        <h1>Order Management Help</h1>
+        <p>This page is used to manage customer orders.</p>
+
+        <h2>How to use it</h2>
+        <ul>
+            <li>Review the list of orders placed by customers.</li>
+            <li>Use the <strong>Fulfill</strong> button once an order has been completed.</li>
+            <li>Use <strong>Cancel</strong> if an order should be removed.</li>
+            <li>Click <strong>Details</strong> to see the items inside an order.</li>
+        </ul>
+
+        <h2>Important notes</h2>
+        <ul>
+            <li>When you cancel an order, the order and its items are removed from the system.</li>
+            <li>Fulfilled orders are counted in the sales reports.</li>
+            <li>Pending orders are still visible and can be processed later.</li>
+        </ul>
+
+        <h2>Recommended workflow</h2>
+        <ul>
+            <li>Check orders daily.</li>
+            <li>Fulfill completed orders quickly.</li>
+            <li>Cancel only if the order is invalid or no longer needed.</li>
+        </ul>
+
+        
+    </div>
 </body>
+
 </html>
