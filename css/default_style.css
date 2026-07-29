@@ -676,3 +676,4 @@ select {
     .admin-report td:nth-of-type(2):before { content: 'Units Sold'; }
     .admin-report td:nth-of-type(3):before { content: 'Revenue'; }
 }
+

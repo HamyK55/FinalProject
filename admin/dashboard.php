@@ -33,7 +33,9 @@ $adminName = $_SESSION["user_name"] ?? "Admin";
 
         <div class="site-links">
             <a class="site-link" href="dashboard.php">Admin Dashboard</a>
+             <a class="site-link" href="../helpPages/help_center.html">Help Center</a>
             <a class="site-link" href="../user-pages/logout.php">Logout</a>
+           
             <span class="site-user-note">
                 Hi, <?= htmlspecialchars($adminName) ?>
             </span>
