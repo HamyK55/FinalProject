@@ -110,7 +110,7 @@ unset($_SESSION["theme_message"]);
     <main class="admin-panel">
         <div class="admin-panel-topbar">
             <h1>Site Templates</h1>
-            <a class="site-link" href="../helpPages/help_center.html">Get Help</a>
+          
         </div>
 
         <section class="admin-placeholder">
