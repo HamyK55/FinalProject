@@ -57,10 +57,7 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC); // Fetch all the results as an as
 	-->
 	<link rel="stylesheet" href="css/default_style.css">
 	<script src="js/theme-switcher.js" defer></script>
-	<link rel="stylesheet" href="css/default_style.css">
-
-	<script src="js/theme-switcher.js" defer></script>
-
+	<link rel="icon" type="image/x-icon" href="images/favicon.ico">
 </head>
 
 <body>

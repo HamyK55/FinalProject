@@ -118,6 +118,7 @@ $loggedInUserName = $_SESSION["user_name"] ?? null;
     <title>Register | Olive Tree Soap Co.</title>
     <link rel="stylesheet" href="../css/default_style.css">
     <script src="../js/theme-switcher.js" defer></script>
+    <link rel="icon" type="image/x-icon" href="../images/favicon.ico">
 </head>
 
 <body>

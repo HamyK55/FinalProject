@@ -248,6 +248,7 @@ foreach ($_SESSION["cart"] as $item) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="View and update your Olive Tree Soap Co. shopping cart.">
 	<meta name="keywords" content="lipbalm, olivetree, soap, skincare, product page">
+    <link rel="icon" type="image/x-icon" href="../images/favicon.ico">
     <title>Shopping Cart | Olive Tree Soap Co.</title>
     <link rel="stylesheet" href="../css/default_style.css">
     <script src="../js/theme-switcher.js" defer></script>

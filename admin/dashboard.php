@@ -24,6 +24,7 @@ $adminName = $_SESSION["user_name"] ?? "Admin";
     <title>Admin Dashboard | Olive Tree Soap Co.</title>
     <link rel="stylesheet" href="../css/default_style.css">
     <script src="../js/theme-switcher.js" defer></script>
+    <link rel="icon" type="image/x-icon" href="../images/favicon.ico">
 </head>
 
 <body class="admin-page">

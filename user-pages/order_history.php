@@ -82,6 +82,7 @@ if ($loggedInUserId > 0 && count($orders) > 0) {
 	<meta name="keywords" content="lipbalm, olivetree, soap, skincare, history, pastOrders">
     <link rel="stylesheet" href="../css/default_style.css">
     <script src="../js/theme-switcher.js" defer></script>
+    <link rel="icon" type="image/x-icon" href="../images/favicon.ico">
 </head>
 
 <body>
