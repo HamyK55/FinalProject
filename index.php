@@ -72,6 +72,11 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC); // Fetch all the results as an as
 
 		<!-- The site-links div contains links for viewing the cart, order history, login/logout, and registration. Depending on it the user is logged it in will show the appropriate links. -->
 		<div class="site-links">
+			
+			<a class="site-link" href="user-pages/aboutUs.html">
+				About Us
+			</a>
+
 			<a class="site-cart-link" href="user-pages/cart.php">
 				View Cart
 			</a>
@@ -102,9 +107,7 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC); // Fetch all the results as an as
 			<?php endif; ?>
 
 
-			<a class="site-link" href="user-pages/aboutUs.html">
-				about us
-			</a>
+			
 
 
 
