@@ -11,7 +11,7 @@ $adminName = $_SESSION["user_name"] ?? "Admin";
 /*
  * Order Management (Admin)
  * ------------------------
- * Purpose: Provide administrators with a list of orders and simple actions
+ * this page provides administrators with a list of orders and simple actions
  * to mark orders as fulfilled or cancel (delete) them.
  *  - Process POST actions: 'fulfill' (update status) and 'cancel' (delete order and items).
  *  - Use transactions when removing order items and the order to ensure DB consistency.
@@ -20,22 +20,25 @@ $adminName = $_SESSION["user_name"] ?? "Admin";
 
 require_once __DIR__ . "/../database/db.php";
 
-// Flash message
+// clear message var
 $message = $_SESSION["order_management_message"] ?? null;
 unset($_SESSION["order_management_message"]);
 
 // Handle POST actions: fulfill or cancel
 if ($_SERVER["REQUEST_METHOD"] === 'POST') {
     $action = $_POST['action'] ?? '';
-    $orderId = filter_input(INPUT_POST, 'order_id', FILTER_VALIDATE_INT);
+    $orderId = filter_input(INPUT_POST, 'order_id', FILTER_VALIDATE_INT); // Make sure order_id is a valid integer
 
+    // Error checking
     if ($orderId === false || $orderId === null) {
         $_SESSION["order_management_message"] = "Invalid order selected.";
         header("Location: order_management.php");
         exit;
     }
 
+
     try {
+        // Update order status to fulfilled in db
         if ($action === 'fulfill') {
             $stmt = $connection->prepare("UPDATE orders SET status = 'Fulfilled' WHERE order_id = :order_id");
             $stmt->execute(['order_id' => $orderId]);
@@ -82,6 +85,7 @@ $ordersStmt = $connection->prepare($ordersSql);
 $ordersStmt->execute();
 $orders = $ordersStmt->fetchAll(PDO::FETCH_ASSOC);
 
+// Fetch order items for each order
 $orderItemsByOrderId = [];
 if (count($orders) > 0) {
     $orderIds = array_map(static fn(array $o): int => (int) $o['order_id'], $orders);
@@ -94,6 +98,8 @@ if (count($orders) > 0) {
     }
 }
 ?>
+
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -123,6 +129,8 @@ if (count($orders) > 0) {
     </header>
 
     <main class="admin-panel">
+
+        <!-- Help link -->
         <div class="admin-panel-topbar">
             <h1>Order Management</h1>
             <a class="site-link" href="../helpPages/order_management_help.html">Get Help</a>
@@ -145,7 +153,9 @@ if (count($orders) > 0) {
                         <th>Actions</th>
                     </tr>
                 </thead>
-                <tbody>
+
+                <!-- Display each order in a table row, with actions to fulfill or cancel, and a toggle for details -->
+                <tbody> 
                     <?php foreach ($orders as $order): ?>
                         <tr>
                             <td><?= htmlspecialchars($order['order_number']) ?></td>
@@ -170,11 +180,13 @@ if (count($orders) > 0) {
                                         <button class="btn btn-danger" type="submit">Cancel</button>
                                     </form>
 
-                                    <!-- Toggle details -->
+                                    <!-- Toggle details onclick -->
                                     <button class="btn btn-neutral" type="button" onclick="document.getElementById('details_<?= (int)$order['order_id'] ?>').classList.toggle('hidden')">Details</button>
                                 </div>
                             </td>
                         </tr>
+                        
+                        <!-- Hidden row for order details, toggled by the "Details" button -->
                         <tr id="details_<?= (int)$order['order_id'] ?>" class="hidden">
                             <td colspan="7" class="order-details">
                                 <?php $items = $orderItemsByOrderId[(int)$order['order_id']] ?? []; ?>
@@ -189,7 +201,9 @@ if (count($orders) > 0) {
                                 <?php endif; ?>
                             </td>
                         </tr>
+
                     <?php endforeach; ?>
+                    
                 </tbody>
             </table>
         </section>

@@ -146,10 +146,6 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC); // Fetch all the results as an as
 						<?= htmlspecialchars($product["product_name"]) ?>
 					</h2>
 
-					<p>
-						<?= htmlspecialchars($product["description"] ?? "") ?>
-					</p>
-
 					<p class="price">
 						$<?= number_format($product["base_price"], 2) ?>
 					</p>

@@ -2,6 +2,7 @@
 
 session_start();
 
+// Check if user is admin
 if (($_SESSION["user_role"] ?? "") !== "admin") {
     header("Location: ../login.php");
     exit;
@@ -11,20 +12,15 @@ $adminName = $_SESSION["user_name"] ?? "Admin";
 /*
  * Sales Page (Admin)
  * ------------------
- * Purpose: Provide a simple sales summary for administrators. 
+ * This page is to provide a simple sales summary for administrators. 
  *  - Totals for fulfilled orders (units sold and revenue),
  *  - Pending totals (units and revenue for non-fulfilled orders),
  *  - Breakdown of units sold and revenue by product for fulfilled orders.
- *
- * Implementation notes:
- *  - Uses `order_items` joined with `orders` to aggregate by product.
- *  - Revenue values are stored in cents in the DB and are converted to dollars for display.
- *  - All database access uses prepared statements.
  */
 
 require_once __DIR__ . "/../database/db.php";
 
-// Get sold items only from fulfilled orders)
+// Get sold items only from fulfilled orders in db
 $soldSql = <<<'SQL'
     SELECT
         oi.product_id,
@@ -41,7 +37,7 @@ $soldStmt = $connection->prepare($soldSql);
 $soldStmt->execute();
 $soldRows = $soldStmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Compute overall sold totals from the aggregated rows
+// Compute overall sold totals from the details from db received
 $totalSoldUnits = 0;
 $totalRevenueCents = 0;
 foreach ($soldRows as $r) {
@@ -49,7 +45,7 @@ foreach ($soldRows as $r) {
     $totalRevenueCents += (int)$r['total_revenue_cents'];
 }
 
-// Query Pending items & revenue (orders not yet fulfilled)
+// Query Overview summary of Pending items & revenue (orders not yet fulfilled)
 
 $pendingSql = <<<'SQL'
     SELECT
@@ -67,7 +63,8 @@ $pendingUnits = (int)($pending['pending_units'] ?? 0);
 $pendingRevenueCents = (int)($pending['pending_revenue_cents'] ?? 0);
 
 
-// Query for orders not yet fulfilled
+
+// Query for all pending orders and their details not yet fulfilled
 
 $pendingByProductSql = <<<'SQL'
     SELECT
@@ -86,6 +83,7 @@ $pendingByProductStmt->execute();
 $pendingRows = $pendingByProductStmt->fetchAll(PDO::FETCH_ASSOC);
 
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -119,7 +117,7 @@ $pendingRows = $pendingByProductStmt->fetchAll(PDO::FETCH_ASSOC);
             <a class="site-link" href="../helpPages/sales_page_help.html">Get Help</a>
         </div>
         
-
+        <!-- Overview section -->
         <section class="admin-report">
             <h2>Overview</h2>
             <p>Total units sold: <strong><?= (int)$totalSoldUnits ?></strong></p>
@@ -127,6 +125,7 @@ $pendingRows = $pendingByProductStmt->fetchAll(PDO::FETCH_ASSOC);
             <p>Pending units: <strong><?= (int)$pendingUnits ?></strong></p>
             <p>Pending revenue: <strong>$<?= number_format($pendingRevenueCents / 100, 2) ?></strong></p>
         </section>
+
 
         <section class="admin-report">
             <h2>Pending by Product (Not Fulfilled)</h2>
@@ -142,6 +141,7 @@ $pendingRows = $pendingByProductStmt->fetchAll(PDO::FETCH_ASSOC);
                         </tr>
                     </thead>
                     <tbody>
+                        <!-- Display each pending product in a table row -->
                         <?php foreach ($pendingRows as $prow): ?>
                             <tr>
                                 <td><?= htmlspecialchars($prow['product_name']) ?></td>
@@ -153,6 +153,7 @@ $pendingRows = $pendingByProductStmt->fetchAll(PDO::FETCH_ASSOC);
                 </table>
             <?php endif; ?>
         </section>
+
 
         <section class="admin-report">
             <h2>Sold by Product (Fulfilled)</h2>
@@ -168,6 +169,7 @@ $pendingRows = $pendingByProductStmt->fetchAll(PDO::FETCH_ASSOC);
                         </tr>
                     </thead>
                     <tbody>
+                        <!-- Display each sold product and totals in table row -->
                         <?php foreach ($soldRows as $row): ?>
                             <tr>
                                 <td><?= htmlspecialchars($row['product_name']) ?></td>

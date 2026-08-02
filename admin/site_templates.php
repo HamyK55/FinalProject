@@ -3,6 +3,7 @@
 // Start the session and make sure the current user is an administrator
 session_start();
 
+// Check if user is admin
 if (($_SESSION["user_role"] ?? "") !== "admin") {
     header("Location: ../login.php");
     exit;

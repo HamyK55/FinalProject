@@ -123,6 +123,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
 
+         /**
+         * Please Note I used the https://www.php.net/manual/en/features.file-upload.php as a reference for learning how to handle file uploads.
+         */
+
+
         // Handle uploaded images (optional)
         $uploadedAny = false;
         if (!empty($_FILES['images']) && is_array($_FILES['images']['name'])) {
@@ -231,6 +236,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="cart-message"><?= htmlspecialchars($message) ?></div>
         <?php endif; ?>
 
+        <!-- Add product from -->
         <form method="post" action="add_product.php" enctype="multipart/form-data" class="product-form">
             <div class="option-group">
                 <label for="product_name">Product Name</label>
@@ -242,6 +248,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <textarea id="description" name="description" rows="4"></textarea>
             </div>
 
+            <!-- Category selection dropdown from db-->
             <div class="option-group">
                 <label for="category_id">Category</label>
                 <select id="category_id" name="category_id" required>
@@ -311,7 +318,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </form>
 
     </main>
-
+    
+    <!-- Template for dynamically adding product option rows, used by js below -->
     <template id="option-row-template">
         <div class="option-entry">
             <div class="option-grid">
@@ -338,7 +346,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
     </template>
     
-    <!-- dynamically add option rows for product options if user selects "Add Another Option" -->
+    <!-- dynamically add option rows for product options if user selects "Add Another Option" using the template html above -->
     <script>
         
         document.addEventListener('DOMContentLoaded', function () {
