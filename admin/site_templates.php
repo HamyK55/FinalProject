@@ -8,7 +8,8 @@ if (($_SESSION["user_role"] ?? "") !== "admin") {
     exit;
 }
 
-$adminName = $_SESSION["user_name"] ?? "Admin";
+// Get Admin name from PHP session var, if not found default value to "Admin"
+$adminName = $_SESSION["user_name"] ?? "Admin"; 
 
 // Location of the file that stores the currently selected theme
 $configPath = __DIR__ . "/../config/site_theme.json";
@@ -29,14 +30,15 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["set_theme"])) {
         $selectedTheme = "default";
     }
 
-    // Convert the selected theme into JSON
+    // Create Array with relevant data
     $themeData = [
         "theme" => $selectedTheme
     ];
 
-    $jsonData = json_encode($themeData, JSON_PRETTY_PRINT);
+    // Convert array to JSON, make the output human readable
+    $jsonData = json_encode($themeData, JSON_PRETTY_PRINT); 
 
-    // Try to save the selected theme
+    // Try to save the selected theme to site_theme.json and update session var with results
     if ($jsonData !== false && file_put_contents($configPath, $jsonData) !== false) {
         $_SESSION["theme_message"] = "The website theme was changed successfully.";
     } else {
@@ -79,8 +81,8 @@ unset($_SESSION["theme_message"]);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Manage your site styling and appearance">
-	<meta name="keywords" content="adminpage, olivetree, site templates, theme">
-    
+    <meta name="keywords" content="adminpage, olivetree, site templates, theme">
+
     <title>Site Templates | Olive Tree Soap Co.</title>
 
     <!--
@@ -95,6 +97,7 @@ unset($_SESSION["theme_message"]);
 <body class="admin-page">
 
     <header class="site-header">
+
         <span class="site-brand">Olive Tree Soap Co.</span>
 
         <div class="site-links">
@@ -106,12 +109,14 @@ unset($_SESSION["theme_message"]);
                 Hi, <?= htmlspecialchars($adminName) ?>
             </span>
         </div>
+
     </header>
 
+
     <main class="admin-panel">
+
         <div class="admin-panel-topbar">
             <h1>Site Templates</h1>
-          
         </div>
 
         <section class="admin-placeholder">
@@ -122,38 +127,26 @@ unset($_SESSION["theme_message"]);
                     <?= htmlspecialchars($themeMessage) ?>
                 </p>
             <?php endif; ?>
-
+            
+            <!-- Submit form containing selected style template to server side php --> 
             <form method="post" action="site_templates.php">
                 <label for="theme_choice">Site theme:</label>
 
                 <select id="theme_choice" name="theme_choice">
-                    <option
-                        value="default"
-                        <?= $currentTheme === "default" ? "selected" : "" ?>
-                    >
+                    <option value="default" <?= $currentTheme === "default" ? "selected" : "" ?>>
                         Default
                     </option>
 
-                    <option
-                        value="christmas"
-                        <?= $currentTheme === "christmas" ? "selected" : "" ?>
-                    >
+                    <option value="christmas" <?= $currentTheme === "christmas" ? "selected" : "" ?>>
                         Christmas
                     </option>
 
-                    <option
-                        value="halloween"
-                        <?= $currentTheme === "halloween" ? "selected" : "" ?>
-                    >
+                    <option value="halloween" <?= $currentTheme === "halloween" ? "selected" : "" ?>>
                         Halloween
                     </option>
                 </select>
 
-                <button
-                    class="btn btn-neutral"
-                    type="submit"
-                    name="set_theme"
-                >
+                <button class="btn btn-neutral" type="submit" name="set_theme">
                     Apply Theme
                 </button>
             </form>

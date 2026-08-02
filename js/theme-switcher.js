@@ -1,65 +1,43 @@
-/*
- * Loads the theme selected in the site theme file.
- * The default stylesheet stays active, and another stylesheet is added
- * when a different theme, such as Christmas or Halloween, is selected.
+
+/**
+ * This code will read from the theme config file and insert the correct styling to the html pages.
  */
+
+// Wait for page to load
 document.addEventListener('DOMContentLoaded', function () {
-    // Find the default stylesheet so the project folder path can be determined
-    var defaultLink = document.querySelector('link[href$="default_style.css"]');
-    if (!defaultLink) return;
+    var siteThemeConfigPath = '/FinalProject/config/site_theme.json';
+    var cssLocationPath = '/FinalProject/css/';
 
-    try {
-        var urlObj = new URL(defaultLink.href, window.location.origin);
+    // function to load correct css style in a given html page based on the name var 
+    function applyTheme(name) {
+        // If there exists a non default styling (link element), ex Christmas, then remove it
+        var existing = document.getElementById('current-custom-styling');
+        if (existing) existing.remove();
 
-        // Find the main project folder
-        var rootPath = urlObj.pathname.replace(
-            /\/css\/default_style\.css(\?.*)?$/,
-            '/'
-        );
+        // Stop if the styling is default
+        if (!name || name === 'default') return;
 
-        if (rootPath === urlObj.pathname) {
-            // Use the current folder if the path could not be found
-            rootPath = urlObj.pathname.replace(/\/[^\/]*$/, '/');
-        }
+        // Create a new "link" element which will point to the custom styling
+        var themeLink = document.createElement('link');
+        themeLink.id = 'current-custom-styling'; // set id, so we can identify and remove styling later
+        themeLink.rel = 'stylesheet';
+        themeLink.href = cssLocationPath + name + '_style.css';
 
-        var origin = urlObj.origin;
-        var cssBase = origin + rootPath + 'css/';
-        var configUrl = origin + rootPath + 'config/site_theme.json';
-
-        // Remove the old theme and load the selected theme
-        function applyTheme(name) {
-            var existing = document.getElementById('theme-override');
-
-            if (existing) {
-                existing.parentNode.removeChild(existing);
-            }
-
-            if (!name || name === 'default') return;
-
-            var href = cssBase + name + '_style.css';
-            var themeLink = document.createElement('link');
-
-            themeLink.id = 'theme-override';
-            themeLink.rel = 'stylesheet';
-            themeLink.href = href;
-
-            document.head.appendChild(themeLink);
-        }
-
-        // Read the selected theme from the JSON file
-        fetch(configUrl, { cache: 'no-store' })
-            .then(function (response) {
-                if (!response.ok) return null;
-                return response.json();
-            })
-            .then(function (config) {
-                if (!config || !config.theme) return;
-                applyTheme(config.theme);
-            })
-            .catch(function () {
-                // Keep using the default theme if the file cannot be loaded
-            });
-    } catch (error) {
-        // Keep using the default theme if something goes wrong
+        // Inject the new css page link to the html
+        document.head.appendChild(themeLink);
     }
+
+
+    // Read from theme config file, set cache to no store, so we dont end up having old styles on pages
+    fetch(siteThemeConfigPath, { cache: 'no-store' })
+        // if file loads successfully it will be converted from JSON text to a js object
+        .then(function (response) {
+            if (!response.ok) return null;
+            return response.json();
+        })
+
+        // Use response to get the theme, input into apply theme function
+        .then(function (config) {
+            if (config && config.theme) applyTheme(config.theme);
+        });
 });
