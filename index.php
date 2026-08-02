@@ -4,7 +4,7 @@
  * This file acts as the initial home page for the application
  * It features all the products available 
  * 
- * Please note, the general format of this code is going to be similar accross the other pages. As such other pages may not be as heavily commented. 
+ * Please note, the general format of this code is going to be similar accross the other pages. As such other pages may not be as heavily commented on the reused sections of code. 
  */
 
 session_start(); // Start browser session which holds data across pages, such as the logged in user. 
@@ -46,7 +46,8 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC); // Fetch all the results as an as
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<meta name="description" content="This page displays all the products in product selection and acts as the home of the app">
+	<meta name="description"
+		content="This page displays all the products in product selection and acts as the home of the app">
 	<meta name="keywords" content="home, olivetree, soap, skincare">
 
 	<title>Our Products</title>
@@ -57,10 +58,7 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC); // Fetch all the results as an as
 	-->
 	<link rel="stylesheet" href="css/default_style.css">
 	<script src="js/theme-switcher.js" defer></script>
-	<link rel="stylesheet" href="css/default_style.css">
-
-	<script src="js/theme-switcher.js" defer></script>
-
+	<link rel="icon" type="image/x-icon" href="images/favicon.ico">
 </head>
 
 <body>
@@ -74,6 +72,11 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC); // Fetch all the results as an as
 
 		<!-- The site-links div contains links for viewing the cart, order history, login/logout, and registration. Depending on it the user is logged it in will show the appropriate links. -->
 		<div class="site-links">
+
+			<a class="site-link" href="user-pages/aboutUs.html">
+				About Us
+			</a>
+
 			<a class="site-cart-link" href="user-pages/cart.php">
 				View Cart
 			</a>
@@ -102,6 +105,12 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC); // Fetch all the results as an as
 				</a>
 
 			<?php endif; ?>
+
+
+
+
+
+
 		</div>
 	</header>
 
@@ -122,10 +131,13 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC); // Fetch all the results as an as
 			<?php foreach ($products as $product): ?>
 
 				<article class="product-card">
+
+					<!-- Render Img -->
 					<?php if (!empty($product['image_path'])): ?>
 						<img class="product-image" src="<?= htmlspecialchars($product['image_path']) ?>"
 							alt="<?= htmlspecialchars($product['product_name']) ?>">
 					<?php endif; ?>
+
 					<p class="category">
 						<?= htmlspecialchars($product["category_name"]) ?>
 					</p>
@@ -133,10 +145,6 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC); // Fetch all the results as an as
 					<h2>
 						<?= htmlspecialchars($product["product_name"]) ?>
 					</h2>
-
-					<p>
-						<?= htmlspecialchars($product["description"] ?? "") ?>
-					</p>
 
 					<p class="price">
 						$<?= number_format($product["base_price"], 2) ?>
@@ -160,7 +168,15 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC); // Fetch all the results as an as
 
 		<?php endif; ?>
 
+
+
+
 	</main>
+
+
+
+	<p class="product-container">All Images on this page, and across the site are the property of the Olive Tree Soap Company Copyright 2026</p>
+
 
 </body>
 

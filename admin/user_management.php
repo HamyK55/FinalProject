@@ -21,9 +21,10 @@ require_once __DIR__ . "/../database/db.php";
 $message = $_SESSION["user_management_message"] ?? null;
 unset($_SESSION["user_management_message"]);
 
+// Handle form submissions for user management actions
 if ($_SERVER["REQUEST_METHOD"] === 'POST') {
     $action = $_POST['action'] ?? '';
-    $userId = filter_input(INPUT_POST, 'user_id', FILTER_VALIDATE_INT);
+    $userId = filter_input(INPUT_POST, 'user_id', FILTER_VALIDATE_INT); 
 
     if ($userId === false || $userId === null) {
         $_SESSION["user_management_message"] = "Invalid user selected.";
@@ -31,7 +32,7 @@ if ($_SERVER["REQUEST_METHOD"] === 'POST') {
         exit;
     }
 
-    // Prevent admin from modifying their own account for dangerous actions
+    // Prevent admin from modifying their own account for potential lockout
     $currentAdminId = (int) ($_SESSION['user_id'] ?? 0);
     if ($userId === $currentAdminId && in_array($action, ['disable', 'promote', 'set_role'])) {
         $_SESSION["user_management_message"] = "You cannot perform that action on your own account.";
@@ -39,6 +40,7 @@ if ($_SERVER["REQUEST_METHOD"] === 'POST') {
         exit;
     }
 
+    // Perform the requested action
     try {
         if ($action === 'disable') {
             $stmt = $connection->prepare("UPDATE users SET is_active = 0 WHERE user_id = :user_id");
@@ -85,6 +87,8 @@ if ($_SERVER["REQUEST_METHOD"] === 'POST') {
 $usersStmt = $connection->query("SELECT user_id, first_name, last_name, email, role, is_active, created_at FROM users ORDER BY created_at DESC");
 $users = $usersStmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
+
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -96,6 +100,7 @@ $users = $usersStmt->fetchAll(PDO::FETCH_ASSOC);
     <title>User Management | Olive Tree Soap Co.</title>
     <link rel="stylesheet" href="../css/default_style.css">
     <script src="../js/theme-switcher.js" defer></script>
+    <link rel="icon" type="image/x-icon" href="../images/favicon.ico">
 </head>
 
 <body class="admin-page">
@@ -118,7 +123,7 @@ $users = $usersStmt->fetchAll(PDO::FETCH_ASSOC);
             <a class="site-link" href="../helpPages/user_management_help.html">Get Help</a>
         </div>
 
-        <!-- Status message area (set after actions like disable/promote/reset) -->
+        <!-- Status message area -->
         <?php if (!empty($message)): ?>
             <div class="cart-message"><?= htmlspecialchars($message) ?></div>
         <?php endif; ?>
@@ -137,6 +142,7 @@ $users = $usersStmt->fetchAll(PDO::FETCH_ASSOC);
                     </tr>
                 </thead>
                 <tbody>
+                <!-- Users table rows -->
                     <?php foreach ($users as $user): ?>
                         <tr style="border-bottom: 1px solid #f0efe9;">
                             <td><?= htmlspecialchars($user['first_name'] . ' ' . $user['last_name']) ?></td>
@@ -148,14 +154,16 @@ $users = $usersStmt->fetchAll(PDO::FETCH_ASSOC);
                                 <div class="actions">
                                     <!-- Disable / Reinstate -->
                                     <?php if ((int)$user['is_active'] === 1): ?>
+                                        <!-- Form for disabling a user account, create popup on submit to confirm -->
                                         <form action="user_management.php" method="post" onsubmit="return confirm('Disable this user account?');">
                                             <input type="hidden" name="user_id" value="<?= (int)$user['user_id'] ?>">
                                             <input type="hidden" name="action" value="disable">
                                             <button class="btn btn-danger" type="submit">Disable</button>
                                         </form>
                                     <?php else: ?>
+                                        <!-- same as above, for reinstate -->
                                         <form action="user_management.php" method="post" onsubmit="return confirm('Reinstate this user account?');">
-                                            <input type="hidden" name="user_id" value="<?= (int)$user['user_id'] ?>">
+                                            <input type="hidden" name="user_id" value="<?= (int)$user['user_id'] ?>"> 
                                             <input type="hidden" name="action" value="reinstate">
                                             <button class="btn btn-neutral" type="submit">Reinstate</button>
                                         </form>
@@ -167,6 +175,7 @@ $users = $usersStmt->fetchAll(PDO::FETCH_ASSOC);
                                         <input type="hidden" name="action" value="set_role">
                                         <?php $selectId = 'role_select_' . (int)$user['user_id']; ?>
                                         <label for="<?= $selectId ?>">Role</label>
+                                        <!-- Dropdown for changing user role, with confirmation on change. Disabled if the user is the current admin to prevent self-demotion -->
                                         <select id="<?= $selectId ?>" name="role" onchange="if(confirm('Change role to ' + this.value + '?')) this.form.submit();" <?= ((int)$user['user_id'] === (int)($_SESSION['user_id'] ?? 0)) ? 'disabled' : '' ?> >
                                             <option value="customer" <?= ($user['role'] === 'customer') ? 'selected' : '' ?>>Customer</option>
                                             <option value="admin" <?= ($user['role'] === 'admin') ? 'selected' : '' ?>>Admin</option>

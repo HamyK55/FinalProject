@@ -17,6 +17,7 @@ $orders = [];
  *   when the user is not logged in or has no orders.
  */
 
+// If the user is logged in, fetch their orders from the database
 if ($loggedInUserId > 0) {
     $ordersSql = "
         SELECT
@@ -41,6 +42,7 @@ if ($loggedInUserId > 0) {
 
 $orderItemsByOrderId = [];
 
+// Fetch all order items for the user's orders
 if ($loggedInUserId > 0 && count($orders) > 0) {
     $orderIds = array_map(static fn(array $order): int => (int) $order["order_id"], $orders);
     $placeholders = implode(", ", array_fill(0, count($orderIds), "?"));
@@ -79,9 +81,10 @@ if ($loggedInUserId > 0 && count($orders) > 0) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Order History | Olive Tree Soap Co.</title>
     <meta name="description" content="order history page to see past orders and their details">
-	<meta name="keywords" content="lipbalm, olivetree, soap, skincare, history, pastOrders">
+    <meta name="keywords" content="lipbalm, olivetree, soap, skincare, history, pastOrders">
     <link rel="stylesheet" href="../css/default_style.css">
     <script src="../js/theme-switcher.js" defer></script>
+    <link rel="icon" type="image/x-icon" href="../images/favicon.ico">
 </head>
 
 <body>
@@ -103,7 +106,7 @@ if ($loggedInUserId > 0 && count($orders) > 0) {
 
     <main class="product-details">
         <h1>Order History</h1>
-        
+
         <!-- Show certain links, based on if the user is logged in or not -->
         <?php if (!$loggedInUserId): ?>
             <div class="cart-message">Please log in to see your saved orders.</div>
@@ -115,25 +118,33 @@ if ($loggedInUserId > 0 && count($orders) > 0) {
                 <p>Once you place an order, it will show up here.</p>
             </div>
         <?php else: ?>
+
+            <!-- Display the list of orders -->
             <div class="order-list">
                 <?php foreach ($orders as $order): ?>
+
                     <article class="order-card">
                         <h2>Order <?= htmlspecialchars($order["order_number"]) ?></h2>
                         <p>Date: <?= htmlspecialchars(date("M j, Y g:i a", strtotime($order["created_at"]))) ?></p>
                         <p>Status: <?= htmlspecialchars($order["status"]) ?></p>
                         <p>Total: $<?= number_format($order["total_cents"] / 100, 2) ?></p>
+
                         <?php if (!empty($orderItemsByOrderId[(int) $order["order_id"]])): ?>
+
                             <ul>
                                 <?php foreach ($orderItemsByOrderId[(int) $order["order_id"]] as $item): ?>
+
                                     <li>
                                         <?= htmlspecialchars($item["product_name"]) ?> x <?= (int) $item["quantity"] ?> -
                                         $<?= number_format($item["line_total_cents"] / 100, 2) ?>
                                         <?php $itemOptions = json_decode($item["options_json"], true); ?>
                                         <?php if (is_array($itemOptions) && count($itemOptions) > 0): ?>
+
                                             <ul>
                                                 <?php foreach ($itemOptions as $option): ?>
                                                     <li><?= htmlspecialchars($option["option_name"] ?? "Option") ?>:
-                                                        <?= htmlspecialchars($option["option_value"] ?? "") ?></li>
+                                                        <?= htmlspecialchars($option["option_value"] ?? "") ?>
+                                                    </li>
                                                 <?php endforeach; ?>
                                             </ul>
                                         <?php endif; ?>
