@@ -99,6 +99,7 @@ $loggedInUserName = $_SESSION["user_name"] ?? null;
         <a class="site-link" href="../index.php">Olive Tree Soap Co.</a>
         <div class="site-links">
             <a class="site-cart-link" href="cart.php">View Cart</a>
+
             <!-- Display different navigation links based on user role -->
             <?php if ($loggedInUserName): ?>
                 <a class="site-link" href="order_history.php">Order History</a>
@@ -109,6 +110,7 @@ $loggedInUserName = $_SESSION["user_name"] ?? null;
                 <a class="site-link" href="login.php">Login</a>
                 <a class="site-link" href="register.php">Register</a>
             <?php endif; ?>
+            
         </div>
     </header>
 

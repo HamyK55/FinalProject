@@ -12,7 +12,6 @@ require_once "../database/db.php";
  *   existing users with the same email.
  * - Create a new user record with a hashed password, sign them in by populating session values,
  *   and redirect to their order history.
- * - Provide generic user-facing messages for validation failures to avoid leaking sensitive info.
  */
 
 
@@ -47,6 +46,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $message = "The passwords do not match.";
     } else {
         // Check whether the email is already registered
+
         $emailCheckSql = "
             SELECT user_id
             FROM users
@@ -59,13 +59,14 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
         $existingUser = $emailCheckStatement->fetch(PDO::FETCH_ASSOC);
 
+        //Do not allow duplicate registrations for the same email
         if ($existingUser) {
-            // Do not allow duplicate registrations for the same email
             $message = "That email is already being used.";
         } else {
             // Hash the password and create the new user record
             $passwordHash = password_hash($password, PASSWORD_DEFAULT);
 
+            // Prepare register user sql statement, insert values which user entered
             $registerSql = "
                 INSERT INTO users (
                     first_name,
@@ -84,7 +85,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 )
             ";
 
+
             $registerStatement = $connection->prepare($registerSql);
+
             $registerStatement->execute([
                 "first_name" => $firstName,
                 "last_name" => $lastName,
@@ -124,18 +127,24 @@ $loggedInUserName = $_SESSION["user_name"] ?? null;
 <body>
 
     <header class="site-header">
+
         <a class="site-link" href="../index.php">Olive Tree Soap Co.</a>
         <div class="site-links">
             <a class="site-cart-link" href="cart.php">View Cart</a>
+
+            <!-- Display different navigation links based on user role -->
             <?php if ($loggedInUserName): ?>
                 <a class="site-link" href="order_history.php">Order History</a>
                 <a class="site-link" href="logout.php">Logout</a>
                 <span class="site-user-note">Hi, <?= htmlspecialchars($loggedInUserName) ?></span>
+
             <?php else: ?>
                 <a class="site-link" href="login.php">Login</a>
                 <a class="site-link" href="register.php">Register</a>
             <?php endif; ?>
+        
         </div>
+
     </header>
 
     <main class="product-details">
@@ -146,7 +155,7 @@ $loggedInUserName = $_SESSION["user_name"] ?? null;
             <div class="cart-message"><?= htmlspecialchars($message) ?></div>
         <?php endif; ?>
 
-        <!-- Registration form: collects user details and posts back to this page -->
+        <!-- Registration form: collects user details and posts back to this page for php to handle and store -->
         <form class="product-form" action="register.php" method="post">
             <div class="option-group">
                 <label for="first_name">First Name</label>

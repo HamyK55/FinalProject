@@ -4,7 +4,7 @@
  * This file acts as the initial home page for the application
  * It features all the products available 
  * 
- * Please note, the general format of this code is going to be similar accross the other pages. As such other pages may not be as heavily commented. 
+ * Please note, the general format of this code is going to be similar accross the other pages. As such other pages may not be as heavily commented on the reused sections of code. 
  */
 
 session_start(); // Start browser session which holds data across pages, such as the logged in user. 
@@ -72,7 +72,7 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC); // Fetch all the results as an as
 
 		<!-- The site-links div contains links for viewing the cart, order history, login/logout, and registration. Depending on it the user is logged it in will show the appropriate links. -->
 		<div class="site-links">
-			
+
 			<a class="site-link" href="user-pages/aboutUs.html">
 				About Us
 			</a>
@@ -107,7 +107,7 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC); // Fetch all the results as an as
 			<?php endif; ?>
 
 
-			
+
 
 
 
@@ -131,10 +131,13 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC); // Fetch all the results as an as
 			<?php foreach ($products as $product): ?>
 
 				<article class="product-card">
+
+					<!-- Render Img -->
 					<?php if (!empty($product['image_path'])): ?>
 						<img class="product-image" src="<?= htmlspecialchars($product['image_path']) ?>"
 							alt="<?= htmlspecialchars($product['product_name']) ?>">
 					<?php endif; ?>
+
 					<p class="category">
 						<?= htmlspecialchars($product["category_name"]) ?>
 					</p>
@@ -169,7 +172,14 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC); // Fetch all the results as an as
 
 		<?php endif; ?>
 
+
+
+
 	</main>
+
+
+	<p>All Images on this page, and across the site are the property of the Olive Tree Soap Company Copyright 2026</p>
+
 
 </body>
 

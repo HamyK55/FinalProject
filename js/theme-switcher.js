@@ -1,12 +1,11 @@
-
 /**
  * This code will read from the theme config file and insert the correct styling to the html pages.
  */
 
 // Wait for page to load
 document.addEventListener('DOMContentLoaded', function () {
-    var siteThemeConfigPath = '/FinalProject/config/site_theme.json';
-    var cssLocationPath = '/FinalProject/css/';
+    var siteThemeConfigPath = '/FinalProject/config/site_theme.json'; // this path changes on the production space
+    var cssLocationPath = '/FinalProject/css/'; //this path changes on the production space
 
     // function to load correct css style in a given html page based on the name var 
     function applyTheme(name) {

@@ -21,11 +21,13 @@ if (!isset($_SESSION["cart"])) {
  *  - On failure, roll back and show a friendly error message.
  */
 
+// redirect to cart
 if (count($_SESSION["cart"]) === 0) {
     header("Location: cart.php");
     exit;
 }
 
+// Set Session vars for use throughout the page
 $userId = (int) ($_SESSION["user_id"] ?? 0);
 $loggedInUserName = $_SESSION["user_name"] ?? null;
 
@@ -33,10 +35,12 @@ $cartSubtotalCents = 0;
 $totalItemQuantity = 0;
 $cartQuantitiesByProduct = [];
 
+// Get Total price of the items in the cart as well as the total quantity of items in the cart. This is used for display and validation during checkout.
 foreach ($_SESSION["cart"] as $item) {
     $cartSubtotalCents += $item["unit_price_cents"] * $item["quantity"];
     $totalItemQuantity += $item["quantity"];
 
+    // Track total quantity per product for stock validation
     if (!isset($cartQuantitiesByProduct[$item["product_id"]])) {
         $cartQuantitiesByProduct[$item["product_id"]] = 0;
     }

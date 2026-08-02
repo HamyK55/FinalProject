@@ -19,7 +19,7 @@ if (!$productId) {
     die("Invalid product ID.");
 }
 
-// Prepare sql query to fetch product details. 
+// Prepare sql query to fetch product details which are active. 
 $sql = "
     SELECT
         products.product_id,
@@ -38,8 +38,8 @@ $sql = "
 
 // Prepare the query to fetch product details, use the product ID from the query string to get the specific product. If the product is not found, return a 404 Not Found response.
 
-$stmt = $connection->prepare($sql); 
-$stmt->execute([ 
+$stmt = $connection->prepare($sql);
+$stmt->execute([
     "product_id" => $productId
 ]);
 
@@ -93,14 +93,14 @@ $images = $imagesStmt->fetchAll(PDO::FETCH_ASSOC);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Configure your product and buy it on this page">
-	<meta name="keywords" content="lipbalm, olivetree, soap, skincare, product page">
+    <meta name="keywords" content="lipbalm, olivetree, soap, skincare, product page">
     <link rel="icon" type="image/x-icon" href="../images/favicon.ico">
 
     <!-- Dynamic page name based on the product name-->
     <title>
         <?= htmlspecialchars($product["product_name"]) ?>
     </title>
-    
+
     <link rel="stylesheet" href="../css/default_style.css">
     <script src="../js/theme-switcher.js" defer></script>
 </head>
@@ -159,17 +159,22 @@ $images = $imagesStmt->fetchAll(PDO::FETCH_ASSOC);
         <h1>
             <?= htmlspecialchars($product["product_name"]) ?>
         </h1>
+
         <!-- Load product image onto screen -->
         <?php if (!empty($images)): ?>
             <?php $main = $images[0]; ?>
             <?php $mainSrc = '../' . ltrim($main['image_path'], '/'); ?>
-            <img id="product-main-image" class="product-main-image" src="<?= htmlspecialchars($mainSrc) ?>" alt="<?= htmlspecialchars($main['alt_text'] ?? $product['product_name']) ?>">
+            <img id="product-main-image" class="product-main-image" src="<?= htmlspecialchars($mainSrc) ?>"
+                alt="<?= htmlspecialchars($main['alt_text'] ?? $product['product_name']) ?>">
 
+            <!-- create smaller thumbnails below the main image.  -->
             <?php if (count($images) > 1): ?>
                 <div class="product-gallery">
+                    <!-- Loop through images and add each image to product thumbnail -->
                     <?php foreach ($images as $img): ?>
                         <?php $thumbSrc = '../' . ltrim($img['image_path'], '/'); ?>
-                        <img class="product-thumb" src="<?= htmlspecialchars($thumbSrc) ?>" alt="<?= htmlspecialchars($img['alt_text'] ?? '') ?>">
+                        <img class="product-thumb" src="<?= htmlspecialchars($thumbSrc) ?>"
+                            alt="<?= htmlspecialchars($img['alt_text'] ?? '') ?>">
                     <?php endforeach; ?>
                 </div>
             <?php endif; ?>
@@ -241,7 +246,7 @@ $images = $imagesStmt->fetchAll(PDO::FETCH_ASSOC);
 
 
     <script>
-        <!-- JavaScript to dynamically update the displayed price based on selected options. It listens for changes in the option dropdowns and recalculates the total price accordingly. -->
+        // JavaScript to dynamically update the displayed price based on selected options. It listens for changes in the option dropdowns and recalculates the total price accordingly.
         const basePrice = <?= json_encode((float) $product["base_price"]) ?>;
         const optionMenus = document.querySelectorAll(".product-option");
         const displayPrice = document.getElementById("display-price");
@@ -267,6 +272,7 @@ $images = $imagesStmt->fetchAll(PDO::FETCH_ASSOC);
         const thumbs = document.querySelectorAll('.product-thumb');
         const mainImage = document.getElementById('product-main-image');
         if (thumbs && mainImage) {
+            // On click, swap thee thumbnail with the main image
             thumbs.forEach(t => t.addEventListener('click', function () {
                 mainImage.src = this.src;
                 mainImage.alt = this.alt || mainImage.alt;
