@@ -174,7 +174,8 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC); // Fetch all the results as an as
 	</main>
 
 
-	<p>All Images on this page, and across the site are the property of the Olive Tree Soap Company Copyright 2026</p>
+
+	<p class="product-container">All Images on this page, and across the site are the property of the Olive Tree Soap Company Copyright 2026</p>
 
 
 </body>

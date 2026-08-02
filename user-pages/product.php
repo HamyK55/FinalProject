@@ -244,6 +244,10 @@ $images = $imagesStmt->fetchAll(PDO::FETCH_ASSOC);
 
     </main>
 
+    
+	<p class="product-container">All Images on this page, and across the site are the property of the Olive Tree Soap Company Copyright 2026</p>
+
+
 
     <script>
         // JavaScript to dynamically update the displayed price based on selected options. It listens for changes in the option dropdowns and recalculates the total price accordingly.
